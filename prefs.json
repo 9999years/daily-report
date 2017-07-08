@@ -7,5 +7,9 @@
 	"google_key_path": "google_keys.json",
 	"app_name": "the daily report",
 	"credential_path": "google_credentials",
-	"api_keys": "keys.json"
+	"api_keys": "keys.json",
+	"width": 80
+	"weather": {
+		"height": 10
+	}
 }

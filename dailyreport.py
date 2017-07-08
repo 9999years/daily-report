@@ -9,6 +9,8 @@ import json
 import requests
 from urllib import parse as urlparse
 
+from collections import namedtuple
+
 import argparse
 flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
 
@@ -25,9 +27,53 @@ keys = json_from_file(prefs['api_keys'])
 def get_weather():
     url = ('http://api.wunderground.com/api/' + keys['wunderground']
         + '/hourly/q/{state}/{city}.json'.format_map(prefs['location']))
-    r = requests.get(url)
-    return r.json()
+    # r = requests.get(url)
+    # return r.json()
+    with open('weather_sample.json') as f:
+        return lson.loads(f.read())
 
+def graph_weather():
+    forecast = get_weather()
+    Weather = namedtuple('Weather', ['temp', 'precip', 'time'])
+    moments = []
+    for hour in forecast['hourly_forecast']:
+        moments.append(Weather(
+            temp=int(hour['temp']['english']),
+            precip=int(hour['pop']),
+            time=str(int(hour['FCTTIME']['hour']) % 12 + 1)
+            + hour['FCTTIME']['ampm'][0]
+        ))
+
+    def limit(list, fn, key):
+        return getattr(fn(list, key=lambda x: getattr(x, key)), key)
+
+    def limits(list, key):
+        return (limit(list, min, key),
+                limit(list, max, key))
+
+    (temp_max, temp_min)     = limits(moments, 'temp')
+    (precip_max, precip_min) = limits(moments, 'precip')
+
+    def place(value, x, y, field):
+        field[y] = field[y][0:x] + value + field[y][x + len(value):]
+
+    width = prefs['width']
+    height = prefs['weather']['height']
+    graph = [' ' * width for x in range(height)]
+
+    def lerp(min, max, amt):
+        """Interpolate from min to max by amt
+        """
+        return amt * (max - min) + min
+
+    for y in range(len(graph)):
+        place(str(int(temp_min, temp_max, 1 - y / (height - 1))),
+            0, y, graph)
+        place(str(int(precip_min, precip_max, 1 - y / (height - 1))),
+            width - 1, y, graph)
+
+    for moment in moments:
+        pass
 
 def get_credentials():
     """Gets valid user credentials from storage.
@@ -77,8 +123,8 @@ def get_today_events():
 
 def main():
     import pprint
-    pp = pprint.PrettyPrinter(indent=1, compact=True)
-    pp.pprint(get_weather())
+    pp = pprint.PrettyPrinter(indent=1, depth=2)
+    graph_weather()
 
 if __name__ == '__main__':
     main()
