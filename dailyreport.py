@@ -12,26 +12,20 @@ from urllib import parse as urlparse
 import argparse
 flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
 
-calendar_scope = 'https://www.googleapis.com/auth/calendar.readonly'
-google_key_path = 'google_keys.json'
-app_name = 'the daily report'
+def json_from_file(fname):
+    with open(fname) as f:
+        return json.loads(f.read())
+    return None
 
 pref_path = 'prefs.json'
+prefs = json_from_file(pref_path)
 
-prefs = {}
-with open(pref_path, encoding='utf-8') as f:
-    prefs = json.loads(f.read())
+keys = json_from_file(prefs['api_keys'])
 
 def get_weather():
-    # json.loads(str)
-    r = requests.get('https://query.yahooapis.com/v1/public/yql?'
-        + urlparse.urlencode({
-            'q': 'select * from weather.forecast where woeid in '
-                '(select woeid from geo.places(1) where text="'
-                + prefs["location"] + '")',
-            'format': 'json',
-            'env': 'store://datatables.org/alltableswithkeys'
-        }))
+    url = ('http://api.wunderground.com/api/' + keys['wunderground']
+        + '/hourly/q/{state}/{city}.json'.format_map(prefs['location']))
+    r = requests.get(url)
     return r.json()
 
 
@@ -44,16 +38,11 @@ def get_credentials():
     Returns:
         Credentials, the obtained credential.
     """
-    global calendar_scope
-    global google_key_path
-    global app_name
-    credential_path = 'google_credentials'
-
-    store = Storage(credential_path)
+    store = Storage(prefs['credential_path'])
     credentials = store.get()
     if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(google_key_path, calendar_scope)
-        flow.user_agent = app_name
+        flow = client.flow_from_clientsecrets(prefs['google_key_path'], prefs['calendar_scope'])
+        flow.user_agent = prefs['app_name']
         credentials = tools.run_flow(flow, store, flags)
         print('Storing credentials')
     return credentials
