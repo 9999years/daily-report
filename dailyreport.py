@@ -11,6 +11,8 @@ from urllib import parse as urlparse
 
 from collections import namedtuple
 
+import colorama
+
 import argparse
 flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
 
@@ -30,18 +32,21 @@ def get_weather():
     # r = requests.get(url)
     # return r.json()
     with open('weather_sample.json') as f:
-        return lson.loads(f.read())
+        return json.loads(f.read())
 
 def graph_weather():
     forecast = get_weather()
     Weather = namedtuple('Weather', ['temp', 'precip', 'time'])
     moments = []
     for hour in forecast['hourly_forecast']:
+        t = str(int(hour['FCTTIME']['hour']) % 12 + 1)
+        if hour['FCTTIME']['ampm'] is 'AM':
+            t = colorama.Fore.BLACK + colorama.Back.WHITE + t + colorama.Style.RESET_ALL
+
         moments.append(Weather(
             temp=int(hour['temp']['english']),
             precip=int(hour['pop']),
-            time=str(int(hour['FCTTIME']['hour']) % 12 + 1)
-            + hour['FCTTIME']['ampm'][0]
+            time=t
         ))
 
     def limit(list, fn, key):
@@ -54,26 +59,50 @@ def graph_weather():
     (temp_max, temp_min)     = limits(moments, 'temp')
     (precip_max, precip_min) = limits(moments, 'precip')
 
-    def place(value, x, y, field):
-        field[y] = field[y][0:x] + value + field[y][x + len(value):]
+    def place(val, x, y, field, align='left'):
+        if align is 'left':
+            field[y] = field[y][0:x] + val + field[y][x + len(val):]
+        elif align is 'right':
+            field[y] = field[y][0:x - len(val)] + val + field[y][x:]
 
     width = prefs['width']
     height = prefs['weather']['height']
-    graph = [' ' * width for x in range(height)]
+    graph = [' ' * width for x in range(height + 1)]
 
     def lerp(min, max, amt):
-        """Interpolate from min to max by amt
-        """
+        """Interpolate from min to max by amt"""
         return amt * (max - min) + min
 
-    for y in range(len(graph)):
-        place(str(int(temp_min, temp_max, 1 - y / (height - 1))),
-            0, y, graph)
-        place(str(int(precip_min, precip_max, 1 - y / (height - 1))),
-            width - 1, y, graph)
+    def between(min, max, val):
+        """fraction val is between min and max"""
+        return (val - min) / (max - min)
 
-    for moment in moments:
-        pass
+    margin = 3
+
+    for y in range(len(graph)):
+        place(str(int(lerp(temp_min, temp_max, y / (height - 1)))),
+            0, y, graph)
+
+        place('|', margin, y, graph)
+
+        place(str(int(lerp(precip_min, precip_max, y / (height - 1)))),
+            width, y, graph, align='right')
+
+        place('|', width - margin, y, graph)
+
+    step = 2
+
+    for i, moment in enumerate(moments):
+        i = i * step + margin + 1
+        place('#', i, int(lerp(0, height - 1,
+            between(temp_min, temp_max, moment.temp))), graph)
+        place('·', i, int(lerp(0, height - 1,
+            between(precip_min, precip_max, moment.precip))), graph)
+        place(moment.time, i, height, graph)
+
+
+    for line in graph:
+        print(line)
 
 def get_credentials():
     """Gets valid user credentials from storage.
@@ -127,4 +156,5 @@ def main():
     graph_weather()
 
 if __name__ == '__main__':
+    colorama.init()
     main()
