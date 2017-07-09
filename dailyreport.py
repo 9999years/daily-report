@@ -39,14 +39,11 @@ def graph_weather():
     Weather = namedtuple('Weather', ['temp', 'precip', 'time'])
     moments = []
     for hour in forecast['hourly_forecast']:
-        t = str(int(hour['FCTTIME']['hour']) % 12 + 1)
-        if hour['FCTTIME']['ampm'] is 'AM':
-            t = colorama.Fore.BLACK + colorama.Back.WHITE + t + colorama.Style.RESET_ALL
-
         moments.append(Weather(
             temp=int(hour['temp']['english']),
             precip=int(hour['pop']),
-            time=t
+            time=str(int(hour['FCTTIME']['hour']) % 12 + 1)
+            + hour['FCTTIME']['ampm']
         ))
 
     def limit(list, fn, key):
@@ -67,7 +64,7 @@ def graph_weather():
 
     width = prefs['width']
     height = prefs['weather']['height']
-    graph = [' ' * width for x in range(height + 1)]
+    graph = [' ' * width for x in range(height + 2)]
 
     def lerp(min, max, amt):
         """Interpolate from min to max by amt"""
@@ -79,7 +76,7 @@ def graph_weather():
 
     margin = 3
 
-    for y in range(len(graph)):
+    for y in range(height):
         place(str(int(lerp(temp_min, temp_max, y / (height - 1)))),
             0, y, graph)
 
@@ -93,13 +90,15 @@ def graph_weather():
     step = 2
 
     for i, moment in enumerate(moments):
+        odd = i % 2
         i = i * step + margin + 1
-        place('#', i, int(lerp(0, height - 1,
+        place('×', i, int(lerp(0, height - 1,
             between(temp_min, temp_max, moment.temp))), graph)
         place('·', i, int(lerp(0, height - 1,
             between(precip_min, precip_max, moment.precip))), graph)
-        place(moment.time, i, height, graph)
 
+        time_num = moment.time[:-2]
+        place(time_num, i, height + odd, graph)
 
     for line in graph:
         print(line)
