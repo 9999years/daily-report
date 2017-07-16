@@ -1,4 +1,4 @@
 *keys.json
-google_credentials
+google_credentials.json
 # cached weather report so we don't stress the wunderground api
 weather_sample.json

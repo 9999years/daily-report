@@ -29,10 +29,11 @@ keys = json_from_file(prefs['api_keys'])
 def get_weather():
     url = ('http://api.wunderground.com/api/' + keys['wunderground']
         + '/hourly/q/{state}/{city}.json'.format_map(prefs['location']))
-    # r = requests.get(url)
-    # return r.json()
-    with open('weather_sample.json') as f:
-        return json.loads(f.read())
+    r = requests.get(url)
+    return r.json()
+    # stub to save api calls
+    # with open('weather_sample.json') as f:
+        # return json.loads(f.read())
 
 def graph_weather():
     forecast = get_weather()
@@ -87,15 +88,20 @@ def graph_weather():
 
         place('|', width - margin, y, graph)
 
-    step = 2
+    step = (width - 2 * margin) / len(moments)
+    time_rows = step
 
     for i, moment in enumerate(moments):
-        odd = i % 2
+        odd = i % time_rows
         i = i * step + margin + 1
         place('×', i, int(lerp(0, height - 1,
             between(temp_min, temp_max, moment.temp))), graph)
-        place('·', i, int(lerp(0, height - 1,
-            between(precip_min, precip_max, moment.precip))), graph)
+        precip_y = int(lerp(0, height - 1,
+            between(precip_min, precip_max, moment.precip)))
+        if graph[precip_y][i] is '×':
+            place('#', i, precip_y, graph)
+        else:
+            place('·', i, precip_y, graph)
 
         time_num = moment.time[:-2]
         place(time_num, i, height + odd, graph)
@@ -115,7 +121,9 @@ def get_credentials():
     store = Storage(prefs['credential_path'])
     credentials = store.get()
     if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(prefs['google_key_path'], prefs['calendar_scope'])
+        flow = client.flow_from_clientsecrets(
+            prefs['google_key_path'], prefs['calendar_scope']
+        )
         flow.user_agent = prefs['app_name']
         credentials = tools.run_flow(flow, store, flags)
         print('Storing credentials')
@@ -150,9 +158,10 @@ def get_today_events():
         print(start, event['summary'])
 
 def main():
-    import pprint
-    pp = pprint.PrettyPrinter(indent=1, depth=2)
-    graph_weather()
+    # import pprint
+    # pp = pprint.PrettyPrinter(indent=1, depth=2)
+    # graph_weather()
+    get_today_events()
 
 if __name__ == '__main__':
     colorama.init()
