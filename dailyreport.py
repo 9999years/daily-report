@@ -8,10 +8,12 @@ import datetime
 import json
 import requests
 from urllib import parse as urlparse
+import os
+import re
 
 from collections import namedtuple
 
-import colorama
+import getcredentials
 
 import argparse
 flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
@@ -109,28 +111,8 @@ def graph_weather():
     for line in graph:
         print(line)
 
-def get_credentials():
-    """Gets valid user credentials from storage.
-
-    If nothing has been stored, or if the stored credentials are invalid,
-    the OAuth2 flow is completed to obtain the new credentials.
-
-    Returns:
-        Credentials, the obtained credential.
-    """
-    store = Storage(prefs['credential_path'])
-    credentials = store.get()
-    if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(
-            prefs['google_key_path'], prefs['calendar_scope']
-        )
-        flow.user_agent = prefs['app_name']
-        credentials = tools.run_flow(flow, store, flags)
-        print('Storing credentials')
-    return credentials
-
 def get_today_events():
-    credentials = get_credentials()
+    credentials = getcredentials.get_credentials(prefs)
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
 
@@ -143,26 +125,42 @@ def get_today_events():
         hour=0, minute=0, second=0, microsecond=0)
     tomorrow = today + datetime.timedelta(days=1)
 
-    print('start = ', today.isoformat())
-    print('end =   ', tomorrow.isoformat())
-
     eventsResult = service.events().list(
         calendarId='primary', singleEvents=True, orderBy='startTime',
         timeMin=today.isoformat(), timeMax=tomorrow.isoformat()).execute()
     events = eventsResult.get('items', [])
 
-    if not events:
-        print('No upcoming events found.')
-    for event in events:
-        start = event['start'].get('dateTime', event['start'].get('date'))
-        print(start, event['summary'])
+    return events
+
+def get_event_times(event):
+    format = '%Y-%m-%dT%H:%M:%S'
+    # yyyy-mm-ddThh-mm-ss
+    # cutting out timezones (±hh:mm)
+    # could also validate with
+    # [+-](2[0-4]|[01]\d):[0-5]\d
+    # or really
+    # [+-](2[0-3]|[01]\d):(00|30)
+    # if we're being strict about it
+    # but uhhh if you wanna live in utc-99:00 thats none of my business
+    tz_regex = re.compile(r'[+-]\d{2}:\d{2}')
+    chop_timezone = lambda tz_str: (
+            tz_str[0:re.search(tz_regex, tz_str).start()])
+    get_date = lambda key: (
+        chop_timezone(event[key].get('dateTime', event[key].get('date'))))
+
+    start = datetime.datetime.strptime(get_date('start'), format)
+    end   = datetime.datetime.strptime(get_date('end'),   format)
+    duration = end - start
+    return (start, end, duration)
 
 def main():
     # import pprint
     # pp = pprint.PrettyPrinter(indent=1, depth=2)
     # graph_weather()
-    get_today_events()
+    events = get_today_events()
+    for event in events:
+        start, end, duration = get_event_times(event)
+        print(start.hour, event['summary'])
 
 if __name__ == '__main__':
-    colorama.init()
     main()
