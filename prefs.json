@@ -6,6 +6,8 @@
 		"{hrule}",
 		"{short_forecast}",
 		"{hrule}",
+		"{weather_graph}",
+		"{hrule}",
 		"{calendar}",
 		"\n"
 	],

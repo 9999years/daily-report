@@ -2,9 +2,11 @@ import datetime
 import json
 import requests
 from urllib import parse as urlparse
+from collections import namedtuple
 import os
 
 import prefs
+import misc
 
 def api_url(endpoint):
     return ('https://api.wunderground.com/api/'
@@ -18,10 +20,11 @@ def weather(endpoint):
     r = requests.get(url)
     return r.json()
 
-def graph_weather():
+def graph():
     forecast = weather('hourly')
     Weather = namedtuple('Weather', ['temp', 'precip', 'time'])
     moments = []
+    i = 0
     for hour in forecast['hourly_forecast']:
         moments.append(Weather(
             temp=int(hour['temp']['english']),
@@ -29,6 +32,10 @@ def graph_weather():
             time=str(int(hour['FCTTIME']['hour']) % 12 + 1)
             + hour['FCTTIME']['ampm']
         ))
+        if i > 24:
+            break
+        else:
+            i += 1
 
     def limit(list, fn, key):
         return getattr(fn(list, key=lambda x: getattr(x, key)), key)
@@ -40,7 +47,9 @@ def graph_weather():
     (temp_max, temp_min)     = limits(moments, 'temp')
     (precip_max, precip_min) = limits(moments, 'precip')
 
-    def place(val, x, y, field, align='left'):
+    def place(val, x, y, align='left'):
+        nonlocal graph
+        field = graph
         if align is 'left':
             field[y] = field[y][0:x] + val + field[y][x + len(val):]
         elif align is 'right':
@@ -48,49 +57,40 @@ def graph_weather():
 
     width = prefs.prefs['width']
     height = prefs.prefs['weather']['height']
-    graph = [' ' * width for x in range(height + 2)]
-
-    def lerp(min, max, amt):
-        """Interpolate from min to max by amt"""
-        return amt * (max - min) + min
-
-    def between(min, max, val):
-        """fraction val is between min and max"""
-        return (val - min) / (max - min)
-
     margin = 3
+    step = int((width - 2 * margin) / len(moments))
+    time_rows = 3 * step
+
+    graph = [' ' * width for x in range(height + time_rows)]
 
     for y in range(height):
-        place(str(int(lerp(temp_min, temp_max, y / (height - 1)))),
-            0, y, graph)
+        place(str(int(misc.lerp(temp_min, temp_max, y / (height - 1)))),
+            0, y)
 
-        place('|', margin, y, graph)
+        place('|', margin - 1, y)
 
-        place(str(int(lerp(precip_min, precip_max, y / (height - 1)))),
-            width, y, graph, align='right')
+        place(str(int(misc.lerp(precip_min, precip_max, y / (height - 1)))),
+            width, y, align='right')
 
-        place('|', width - margin, y, graph)
-
-    step = (width - 2 * margin) / len(moments)
-    time_rows = step
+        place('|', width - margin, y)
 
     for i, moment in enumerate(moments):
         odd = i % time_rows
-        i = i * step + margin + 1
-        place('×', i, int(lerp(0, height - 1,
-            between(temp_min, temp_max, moment.temp))), graph)
-        precip_y = int(lerp(0, height - 1,
-            between(precip_min, precip_max, moment.precip)))
+        i = int(i * step + margin)
+        temp_y = int(misc.scale(
+            moment.temp, temp_min, temp_max, 0, height - 1))
+        place('x', i, temp_y)
+        precip_y = int(misc.scale(
+            moment.precip, precip_min, precip_max, 0, height - 1))
         if graph[precip_y][i] is '×':
-            place('#', i, precip_y, graph)
+            place('O', i, precip_y)
         else:
-            place('·', i, precip_y, graph)
+            place('.', i, precip_y)
 
         time_num = moment.time[:-2]
-        place(time_num, i, height + odd, graph)
+        place(time_num, i, height + odd)
 
-    for line in graph:
-        print(line)
+    return '\n'.join(graph)
 
 def forecast():
     forecast = weather('forecast')['forecast']
