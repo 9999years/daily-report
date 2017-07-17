@@ -25,6 +25,8 @@ def main():
                 # string
                 msg = msg.replace(txt, replacement)
 
+    # by passing functions we don't evaluate unless included in
+    # prefs['format'] --- no weather api calls if you don't want weather, etc.
     replace('{hrule}', misc.hrule)
     replace('{today}', dates.today_date)
     replace('{iso_date}', dates.iso_date)

@@ -117,15 +117,19 @@ def events():
     out = ''
     def format_event(time, event):
         nonlocal out
-        margin = 9
-        leader_visual = '|'
+        leader_visual = ' | '
+        margin = len(time) + len(leader_visual)
         leader = ' ' * (margin - len(leader_visual))
-        width = prefs.prefs['width'] - margin - 1
+        width = prefs.prefs['width'] - margin
+        if time == 'all day' and event.duration.days > 1:
+            event.info['summary'] += (
+                f' (day {(today - event.start).days} '
+                f'of {(event.end - event.start).days})')
         summary = textwrap.wrap(
             event.info['summary'], width=width)
-        out += f'{time} {leader_visual} {summary.pop(0)}\n'
+        out += f'{time}{leader_visual}{summary.pop(0)}\n'
         for line in summary:
-            out += (f'{leader}{leader_visual} {line}\n')
+            out += (f'{leader}{leader_visual}{line}\n')
 
     for event in alldays:
         format_event('all day', event)
