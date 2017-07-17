@@ -100,7 +100,7 @@ def forecast():
     precip   = int(day_data['pop'])
     conds    = day_data['conditions']
     summary  = txt_data['fcttext']
-    return f'{low}-{high}F, {precip}% chance of precip.\n{conds}'
+    return f'{low}-{high}F, {precip}% chance of precip.\n{conds}'.lower()
 
 def main():
     prefs.get_prefs()

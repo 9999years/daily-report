@@ -125,7 +125,7 @@ def main():
     today, tomorrow = today_times()
 
     print('good morning!\ntoday is '
-        + today.strftime('%A, %B %d') + '\n'
+        + today.strftime('%A, %B %d').lower() + '\n'
         + left_pad(today.strftime('%Y-%m-%d'), prefs.prefs['width']))
 
     print(hrule)
