@@ -1,4 +1,14 @@
 {
+	"format": [
+		"good morning!",
+		"{today}",
+		"{iso_date}",
+		"{hrule}",
+		"{short_forecast}",
+		"{hrule}",
+		"{calendar}",
+		"\n"
+	],
 	"location": {
 		"state": "va",
 		"city": "reston"
