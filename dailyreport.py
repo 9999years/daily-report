@@ -32,10 +32,13 @@ def timezone():
         # delt = delt + datetime.timedelta(
             # seconds=1 if delt.microseconds > 500000 else -1)
         # delt = delt.replace(microseconds=0)
-    delt = delt.replace(microseconds=0)
+    delt -= datetime.timedelta(microseconds=delt.microseconds)
     # round to nearest minute
-    if delt.seconds % 60 is not 0:
-        delt = delt.replace(seconds=round(delt.seconds / 60) * 60)
+    extra_secs = delt.seconds % 60
+    if extra_secs is not 0:
+        delt += datetime.timedelta(
+            seconds=60 - extra_secs if extra_secs >= 30 else -extra_secs
+        )
     print(delt)
     return datetime.timezone(delt)
 
