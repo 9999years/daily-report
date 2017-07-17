@@ -10,7 +10,7 @@ import requests
 from urllib import parse as urlparse
 import os
 
-def get_credentials(prefs):
+def credentials(prefs):
     """Gets valid user credentials from storage.
 
     If nothing has been stored, or if the stored credentials are invalid,
@@ -32,4 +32,4 @@ def get_credentials(prefs):
     return credentials
 
 if __name__ is '__main__':
-    print(get_credentials())
+    print(credentials())
