@@ -39,7 +39,6 @@ def timezone():
         delt += datetime.timedelta(
             seconds=60 - extra_secs if extra_secs >= 30 else -extra_secs
         )
-    print(delt)
     return datetime.timezone(delt)
 
 
