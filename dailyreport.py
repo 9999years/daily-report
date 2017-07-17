@@ -31,6 +31,7 @@ def main():
     replace('{today}', dates.today_date)
     replace('{iso_date}', dates.iso_date)
     replace('{short_forecast}', weather.forecast)
+    replace('{weather_graph}', weather.graph)
     replace('{calendar}', dates.events)
 
     print(msg)
