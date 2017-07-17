@@ -1,13 +1,7 @@
 import httplib2
 from apiclient import discovery
-from oauth2client import client
-from oauth2client import tools
-from oauth2client.file import Storage
+import oauth2client as oauth
 
-import datetime
-import json
-import requests
-from urllib import parse as urlparse
 import os
 
 def credentials(prefs):
@@ -20,14 +14,14 @@ def credentials(prefs):
         Credentials, the obtained credential.
     """
     cred_path = os.path.abspath(prefs['credential_path'])
-    store = Storage(prefs['credential_path'])
+    store = oauth.file.Storage(prefs['credential_path'])
     credentials = store.get()
     if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(
+        flow = oauth.client.flow_from_clientsecrets(
             prefs['google_key_path'], prefs['calendar_scope']
         )
         flow.user_agent = prefs['app_name']
-        credentials = tools.run_flow(flow, store, flags)
+        credentials = oauth.tools.run_flow(flow, store, flags)
         print('Storing credentials')
     return credentials
 

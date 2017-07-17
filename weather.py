@@ -7,8 +7,10 @@ import os
 import prefs
 
 def api_url(endpoint):
-    return ('http://api.wunderground.com/api/' + prefs.keys['wunderground']
-        + f'/{endpoint}'
+    return ('https://api.wunderground.com/api/'
+        + prefs.keys['wunderground']
+        + '/'
+        + endpoint
         + '/q/{state}/{city}.json'.format_map(prefs.prefs['location']))
 
 def weather(endpoint):
@@ -91,19 +93,17 @@ def graph_weather():
         print(line)
 
 def forecast():
-    prefs.get_prefs()
     forecast = weather('forecast')['forecast']
     day_data = forecast['simpleforecast']['forecastday'][0]
     txt_data = forecast['txt_forecast']['forecastday'][0]
     high     = int(day_data['high']['fahrenheit'])
     low      = int(day_data['low']['fahrenheit'])
     precip   = int(day_data['pop'])
-    conds    = day_data['conditions']
+    conds    = day_data['conditions'].lower()
     summary  = txt_data['fcttext']
-    return f'{low}-{high}F, {precip}% chance of precip.\n{conds}'.lower()
+    return f'{low}-{high}F, {precip}% chance of precip.\n{conds}'
 
 def main():
-    prefs.get_prefs()
     forecast()
 
 if __name__ == '__main__':
