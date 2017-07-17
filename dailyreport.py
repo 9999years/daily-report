@@ -113,11 +113,14 @@ def hours(time):
     return hours + ':' + datetime.datetime.strftime(time, '%M%p')
 
 def main():
-    # import pprint
-    # pp = pprint.PrettyPrinter(indent=1, depth=2)
-    # graph_weather()
+    hrule = '-' * 40
     Event = namedtuple('Event', ['start', 'end', 'duration', 'info'])
     today, tomorrow = today_times()
+
+    print('good morning!\ntoday is ' + today.strftime('%A, %B %d (%y-%m-%d)'))
+
+    print(hrule)
+
     events = today_events()
     alldays = []
     todays = []
@@ -131,10 +134,14 @@ def main():
                 start=start, end=end, duration=duration, info=event))
 
     for event in alldays:
-        print('ALL DAY: ', event.info['summary'])
+        print('all day: ', event.info['summary'])
+
+    print(hrule)
 
     for event in todays:
         print(hours(event.start), ' - ', event.info['summary'])
+
+    print('\n\n')
 
 if __name__ == '__main__':
     prefs, keys = prefs.prefs()
