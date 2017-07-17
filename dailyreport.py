@@ -26,9 +26,18 @@ global prefs
 global keys
 
 def timezone():
-    return datetime.timezone(
-        datetime.datetime.now() - datetime.datetime.utcnow()
-    )
+    delt = datetime.datetime.now() - datetime.datetime.utcnow()
+    # round to the nearest second for some unix nonsense
+    # if delt.microseconds is not 0:
+        # delt = delt + datetime.timedelta(
+            # seconds=1 if delt.microseconds > 500000 else -1)
+        # delt = delt.replace(microseconds=0)
+    delt = delt.replace(microseconds=0)
+    # round to nearest minute
+    if delt.seconds % 60 is not 0:
+        delt = delt.replace(seconds=round(delt.seconds / 60) * 60)
+    print(delt)
+    return datetime.timezone(delt)
 
 
 def today_times():
