@@ -12,6 +12,7 @@ import requests
 from urllib import parse as urlparse
 import os
 import re
+import textwrap
 
 from collections import namedtuple
 
@@ -25,6 +26,11 @@ import weather
 
 global prefs
 global keys
+
+def left_pad(txt, width, char=' '):
+    while len(txt) < width:
+        txt = char + txt
+    return txt
 
 def timezone():
     delt = datetime.datetime.now() - datetime.datetime.utcnow()
@@ -57,7 +63,7 @@ def today_times():
 
 
 def today_events():
-    credentials = creds.credentials(prefs)
+    credentials = creds.credentials(prefs.prefs)
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
 
@@ -114,11 +120,13 @@ def hours(time):
     return hours + ':' + datetime.datetime.strftime(time, '%M%p')
 
 def main():
-    hrule = '-' * 32
+    hrule = '-' * prefs.prefs['width']
     Event = namedtuple('Event', ['start', 'end', 'duration', 'info'])
     today, tomorrow = today_times()
 
-    print('good morning!\ntoday is ' + today.strftime('%A, %B %d (%y-%m-%d)'))
+    print('good morning!\ntoday is '
+        + today.strftime('%A, %B %d').lower() + '\n'
+        + left_pad(today.strftime('%Y-%m-%d'), prefs.prefs['width']))
 
     print(hrule)
 
@@ -138,16 +146,27 @@ def main():
             todays.append(Event(
                 start=start, end=end, duration=duration, info=event))
 
+    def print_event(time, event):
+        margin = 9
+        leader_visual = '|'
+        leader = ' ' * (margin - len(leader_visual))
+        width = prefs.prefs['width'] - margin - 1
+        summary = textwrap.wrap(
+            event.info['summary'], width=width)
+        print(f'{time} {leader_visual} {summary.pop(0)}')
+        for line in summary:
+            print(f'{leader}{leader_visual} {line}')
+
     for event in alldays:
-        print('all day: ', event.info['summary'])
+        print_event('all day', event)
 
     print(hrule)
 
     for event in todays:
-        print(hours(event.start), ' - ', event.info['summary'])
+        print_event(hours(event.start), event)
 
     print('\n\n')
 
 if __name__ == '__main__':
-    prefs, keys = prefs.get_prefs()
+    prefs.get_prefs()
     main()
