@@ -16,19 +16,22 @@ def main():
     msg = '\n'.join(prefs.prefs['format'])
 
     def replace(txt, replacement):
+        nonlocal msg
         if txt in msg:
             if callable(replacement):
                 # function for lazy eval.
-                msg.replace(txt, replacement())
+                msg = msg.replace(txt, replacement())
             else:
                 # string
-                msg.replace(txt, replacement)
+                msg = msg.replace(txt, replacement)
 
     replace('{hrule}', misc.hrule)
     replace('{today}', dates.today_date)
     replace('{iso_date}', dates.iso_date)
     replace('{short_forecast}', weather.forecast)
     replace('{calendar}', dates.events)
+
+    print(msg)
 
 if __name__ == '__main__':
     prefs.get_prefs()

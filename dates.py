@@ -6,6 +6,7 @@ import httplib2
 from apiclient import discovery
 # gcal date parsing
 import re
+import textwrap
 
 # local
 import misc
@@ -99,7 +100,6 @@ def hours(time):
 
 def events():
     Event = namedtuple('Event', ['start', 'end', 'duration', 'info'])
-    out = ''
     today, tomorrow = today_times()
 
     events = today_events()
@@ -114,24 +114,26 @@ def events():
             todays.append(Event(
                 start=start, end=end, duration=duration, info=event))
 
-    def print_event(time, event):
+    out = ''
+    def format_event(time, event):
+        nonlocal out
         margin = 9
         leader_visual = '|'
         leader = ' ' * (margin - len(leader_visual))
         width = prefs.prefs['width'] - margin - 1
         summary = textwrap.wrap(
             event.info['summary'], width=width)
-        out += f'{time} {leader_visual} {summary.pop(0)}'
+        out += f'{time} {leader_visual} {summary.pop(0)}\n'
         for line in summary:
-            out += (f'{leader}{leader_visual} {line}')
+            out += (f'{leader}{leader_visual} {line}\n')
 
     for event in alldays:
-        print_event('all day', event)
+        format_event('all day', event)
 
-    out += misc.hrule()
+    out += misc.hrule() + '\n'
 
     for event in todays:
-        print_event(hours(event.start), event)
+        format_event(hours(event.start), event)
 
     return out
 

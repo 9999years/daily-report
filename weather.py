@@ -7,8 +7,10 @@ import os
 import prefs
 
 def api_url(endpoint):
-    return ('http://api.wunderground.com/api/' + prefs.keys['wunderground']
-        + f'/{endpoint}'
+    return ('https://api.wunderground.com/api/'
+        + prefs.keys['wunderground']
+        + '/'
+        + endpoint
         + '/q/{state}/{city}.json'.format_map(prefs.prefs['location']))
 
 def weather(endpoint):
