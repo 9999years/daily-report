@@ -4,17 +4,20 @@ import requests
 from urllib import parse as urlparse
 import os
 
-def weather():
-    url = ('http://api.wunderground.com/api/' + keys['wunderground']
-        + '/hourly/q/{state}/{city}.json'.format_map(prefs['location']))
+import prefs
+
+def api_url(endpoint):
+    return ('http://api.wunderground.com/api/' + prefs.keys['wunderground']
+        + f'/{endpoint}'
+        + '/q/{state}/{city}.json'.format_map(prefs.prefs['location']))
+
+def weather(endpoint):
+    url = api_url(endpoint)
     r = requests.get(url)
     return r.json()
-    # stub to save api calls
-    # with open('weather_sample.json') as f:
-        # return json.loads(f.read())
 
 def graph_weather():
-    forecast = weather()
+    forecast = weather('hourly')
     Weather = namedtuple('Weather', ['temp', 'precip', 'time'])
     moments = []
     for hour in forecast['hourly_forecast']:
@@ -41,8 +44,8 @@ def graph_weather():
         elif align is 'right':
             field[y] = field[y][0:x - len(val)] + val + field[y][x:]
 
-    width = prefs['width']
-    height = prefs['weather']['height']
+    width = prefs.prefs['width']
+    height = prefs.prefs['weather']['height']
     graph = [' ' * width for x in range(height + 2)]
 
     def lerp(min, max, amt):
@@ -87,3 +90,21 @@ def graph_weather():
     for line in graph:
         print(line)
 
+def forecast():
+    prefs.get_prefs()
+    forecast = weather('forecast')['forecast']
+    day_data = forecast['simpleforecast']['forecastday'][0]
+    txt_data = forecast['txt_forecast']['forecastday'][0]
+    high     = int(day_data['high']['fahrenheit'])
+    low      = int(day_data['low']['fahrenheit'])
+    precip   = int(day_data['pop'])
+    conds    = day_data['conditions']
+    summary  = txt_data['fcttext']
+    return f'{low}-{high}F, {precip}% prec.\n{conds}'
+
+def main():
+    prefs.get_prefs()
+    forecast()
+
+if __name__ == '__main__':
+    main()

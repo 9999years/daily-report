@@ -21,6 +21,7 @@ flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
 # local imports
 import gen_credentials as creds
 import prefs
+import weather
 
 global prefs
 global keys
@@ -113,11 +114,15 @@ def hours(time):
     return hours + ':' + datetime.datetime.strftime(time, '%M%p')
 
 def main():
-    hrule = '-' * 40
+    hrule = '-' * 32
     Event = namedtuple('Event', ['start', 'end', 'duration', 'info'])
     today, tomorrow = today_times()
 
     print('good morning!\ntoday is ' + today.strftime('%A, %B %d (%y-%m-%d)'))
+
+    print(hrule)
+
+    print(weather.forecast())
 
     print(hrule)
 
@@ -144,5 +149,5 @@ def main():
     print('\n\n')
 
 if __name__ == '__main__':
-    prefs, keys = prefs.prefs()
+    prefs, keys = prefs.get_prefs()
     main()
