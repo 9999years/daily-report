@@ -12,16 +12,20 @@ Usage:
     $ ./dailyreport.py
 
     good morning!
-    today is Monday, July 17 (17-07-17)
+    today is monday, july 17
+                          2017-07-17
     --------------------------------
-    70-89F, 50% chance of precip.
-    Chance of a Thunderstorm
+    70-88F, 40% chance of precip.
+    chance of a thunderstorm
     --------------------------------
-    all day:  parents gone
-    all day:  business cards
+    all day | business cards
     --------------------------------
-    12:30PM  -  schedule clinic visit
-     8:00PM  -  egg drop soup (possibly w/ aya)
+     3:30PM | schedule doctor's appt
+     3:30PM | heather
+     8:00PM | egg drop soup w/
+            | camille (& possibly
+            | aya)
+
 
 Make sure to edit `prefs.json` for accurate weather forecasts.
 
