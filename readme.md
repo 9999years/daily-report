@@ -29,6 +29,10 @@ Usage:
 
 Make sure to edit `prefs.json` for accurate weather forecasts.
 
+Potential usage with `cron`, to print daily at 6am:
+
+    0 6 * * * cd /home/pi/daily-report && git pull && ./dailyreport.py | lpr -l
+
 # `keys.json`
 
 `keys.json` should have the following keys:
