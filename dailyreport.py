@@ -19,7 +19,7 @@ def main():
 
     args = parser.parse_args()
 
-    prefs.get_prefs(encoding=args.encoding)
+    prefs.get_prefs()
 
     msg = '\n'.join(prefs.prefs['format'])
 
