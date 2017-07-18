@@ -67,25 +67,27 @@ def graph():
         place(str(int(misc.lerp(temp_min, temp_max, y / (height - 1)))),
             0, y)
 
-        place('|', margin - 1, y)
+        place(prefs.prefs['vert'], margin - 1, y)
 
         place(str(int(misc.lerp(precip_min, precip_max, y / (height - 1)))),
             width, y, align='right')
 
-        place('|', width - margin, y)
+        place(prefs.prefs['vert'], width - margin, y)
+
+    chars = prefs.prefs['weather']['chars']
 
     for i, moment in enumerate(moments):
         odd = i % time_rows
         i = int(i * step + margin)
         temp_y = int(misc.scale(
             moment.temp, temp_min, temp_max, 0, height - 1))
-        place('x', i, temp_y)
+        place(chars['temp'], i, temp_y)
         precip_y = int(misc.scale(
             moment.precip, precip_min, precip_max, 0, height - 1))
-        if graph[precip_y][i] is '×':
-            place('O', i, precip_y)
+        if graph[precip_y][i] is chars['temp']:
+            place(chars['both'], i, precip_y)
         else:
-            place('.', i, precip_y)
+            place(chars['precip'], i, precip_y)
 
         time_num = moment.time[:-2]
         place(time_num, i, height + odd)
@@ -101,7 +103,7 @@ def forecast():
     precip   = int(day_data['pop'])
     conds    = day_data['conditions'].lower()
     summary  = txt_data['fcttext']
-    return f'{low}-{high}F, {precip}% chance of precip.\n{conds}'
+    return f'{low}-{high}°F, {precip}% chance of precip.\n{conds}'
 
 def main():
     forecast()

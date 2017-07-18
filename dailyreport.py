@@ -1,6 +1,6 @@
 #! /usr/local/bin/python3
-
 import argparse
+from sys import stdout
 
 # local imports
 import gen_credentials as creds
@@ -9,10 +9,18 @@ import weather
 import dates
 import misc
 
-global prefs
-global keys
-
 def main():
+    parser = argparse.ArgumentParser(
+        description='Generates a daily report'
+    )
+
+    parser.add_argument('-e', '--encoding',  type=str, default='utf-8',
+        help='Output encoding. Default is UTF-8.')
+
+    args = parser.parse_args()
+
+    prefs.get_prefs(encoding=args.encoding)
+
     msg = '\n'.join(prefs.prefs['format'])
 
     def replace(txt, replacement):
@@ -27,15 +35,21 @@ def main():
 
     # by passing functions we don't evaluate unless included in
     # prefs['format'] --- no weather api calls if you don't want weather, etc.
-    replace('{hrule}', misc.hrule)
-    replace('{today}', dates.today_date)
-    replace('{iso_date}', dates.iso_date)
-    replace('{short_forecast}', weather.forecast)
-    replace('{weather_graph}', weather.graph)
-    replace('{calendar}', dates.events)
+    replacements = {
+        ('{hrule}',          misc.hrule),
+        ('{today}',          dates.today_date),
+        ('{iso_date}',       dates.iso_date),
+        ('{short_forecast}', weather.forecast),
+        ('{weather_graph}',  weather.graph),
+        ('{calendar}',       dates.events),
+        ('{countdown}',      dates.today_countdowns),
+        ('{todo}',           dates.today_todos),
+    }
 
-    print(msg)
+    for replacement, fn in replacements:
+        replace(replacement, fn)
+
+    stdout.buffer.write(msg.encode(args.encoding, errors='replace'))
 
 if __name__ == '__main__':
-    prefs.get_prefs()
     main()
