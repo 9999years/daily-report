@@ -26,6 +26,7 @@ def main():
 
     def replace(txt, replacement):
         nonlocal msg
+        txt = f'{{{txt}}}'
         if txt in msg:
             if callable(replacement):
                 # function for lazy eval.

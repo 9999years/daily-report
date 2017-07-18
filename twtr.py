@@ -27,10 +27,10 @@ def format(tweet):
     date = get_date(tweet)
     return (textwrap.fill(f'@{tweet.user.screen_name}: {tweet.text}',
             width=prefs.prefs['width'])
-        + f'{tweet.favorite_count} likes, {tweet.retweet_count} rts\n'
+        + f'\n{tweet.favorite_count} likes, {tweet.retweet_count} rts\n'
         + datetime.datetime.strftime(date, '%Y-%m-%d %I:%M:%S %p'))
 
-def last(user='dril'):
+def since_yesterday(user='dril'):
     tweets = get_tweets(user)
     valid = []
     today, tomorrow = dates.today_times()
@@ -43,3 +43,7 @@ def last(user='dril'):
         if date > yesterday:
             valid.append(format(tweet))
     return valid
+
+def last(user='dril'):
+    tweets = since_yesterday(user)
+    return tweets[0] if len(tweets) > 0 else ''
