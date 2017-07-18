@@ -13,8 +13,6 @@
 		"{todo}",
 		"{hrule}",
 		"{countdown}",
-		"{hrule}",
-		"{twitter}",
 		"\n\n"
 	],
 	"location": {
@@ -29,7 +27,7 @@
 	"horiz": "-",
 	"vert": "|",
 	"weather": {
-		"height": 10,
+		"height": 6,
 		"chars": {
 			"precip": "·",
 			"temp": "×",

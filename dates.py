@@ -147,7 +147,7 @@ def today_countdowns():
         leader = ' ' + prefs.prefs['vert'] + ' '
         ret += misc.format_left(event['summary'],
             leader=leader,
-            firstline=days_until(event) + leader)
+            firstline=misc.left_pad(days_until(event), left_width) + leader)
 
     countdowns = []
     for cal in countdown_cals:
@@ -164,7 +164,7 @@ def today_countdowns():
 
     countdowns = sorted(countdowns, key=lambda k: k['start'])
 
-    left_width = days_until(countdowns[0])
+    left_width = len(days_until(countdowns[-1]))
 
     for countdown in countdowns:
         add_countdown(countdown)
