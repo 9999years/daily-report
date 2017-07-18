@@ -9,19 +9,36 @@
 		"{weather_graph}",
 		"{hrule}",
 		"{calendar}",
+		"{hrule}",
+		"{todo}",
+		"{hrule}",
+		"{countdown}",
 		"\n"
 	],
 	"location": {
 		"state": "va",
 		"city": "reston"
 	},
-	"calendar_scope": "https://www.googleapis.com/auth/calendar.readonly",
 	"google_key_path": "google_keys.json",
 	"credential_path": "google_credentials.json",
 	"app_name": "the daily report",
 	"api_keys": "keys.json",
 	"width": 32,
+	"horiz": "—",
+	"vert": "|",
 	"weather": {
-		"height": 10
+		"height": 10,
+		"chars": {
+			"precip": "·",
+			"temp": "×",
+			"both": "O"
+		}
+	},
+	"calendar": {
+		"scope": "https://www.googleapis.com/auth/calendar.readonly",
+		"todo_pat": "to.?do",
+		"countdown_pat": "count.?downs?",
+		"todo_check": "[] ",
+		"max_countdowns": 10
 	}
 }

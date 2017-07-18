@@ -42,10 +42,7 @@ def today_times():
     return today, tomorrow
 
 def today_events():
-    credentials = creds.credentials(prefs.prefs)
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('calendar', 'v3', http=http)
-
+    credentials, http, service = creds.build_creds()
     today, tomorrow = today_times()
 
     eventsResult = service.events().list(
@@ -54,6 +51,20 @@ def today_events():
     events = eventsResult.get('items', [])
 
     return events
+
+def list_calendars():
+    credentials, http, service = creds.build_creds()
+    return service.calendarList().list().execute()['items']
+
+def calendar_match(pat, regex=True):
+    cals = list_calendars()
+    outs = []
+    for cal in cals:
+        if regex and re.search(pat, cal['summary'], flags=re.IGNORECASE):
+            outs.append(cal)
+        elif pat in cal['summary']:
+            outs.append(cal)
+    return outs
 
 def event_times(event):
     '''takes a google calendar event, returns the start / end times and
@@ -85,10 +96,10 @@ def event_times(event):
     time_parse = lambda key: (
         datetime.datetime.strptime(*date(key)).replace(tzinfo=zone))
 
-    start = time_parse('start')
-    end   = time_parse('end')
-    duration = end - start
-    return (start, end, duration)
+    event['start']    = time_parse('start')
+    event['end']      = time_parse('end')
+    event['duration'] = event['end'] - event['start']
+    return event
 
 def hours(time):
     hours = datetime.datetime.strftime(time, '%I')
@@ -98,38 +109,92 @@ def hours(time):
         hours = hours[:i] + ' ' + hours[i + 1:]
     return hours + ':' + datetime.datetime.strftime(time, '%M%p')
 
+def today_todos():
+    credentials, http, service = creds.build_creds()
+    today, tomorrow = today_times()
+    todo_cals = calendar_match(prefs.prefs['calendar']['todo_pat'])
+    ret = ''
+    def add_todo(event):
+        nonlocal ret
+        ret += misc.format_left(event['summary'],
+            firstline=prefs.prefs['calendar']['todo_check'])
+        pass
+
+    todos = []
+    for cal in todo_cals:
+        eventsResult = service.events().list(
+            calendarId=cal['id'], singleEvents=True, orderBy='updated',
+            timeMin=today.isoformat(), timeMax=tomorrow.isoformat()).execute()
+        todos.extend(eventsResult.get('items', []))
+
+    for todo in todos:
+        add_todo(todo)
+
+    return ret.rstrip()
+
+def today_countdowns():
+    credentials, http, service = creds.build_creds()
+    today, tomorrow = today_times()
+    countdown_cals = calendar_match(prefs.prefs['calendar']['countdown_pat'])
+    ret = ''
+
+    def days_until(event):
+        return str((event['start'] - today).days)
+
+    def add_countdown(event):
+        nonlocal ret
+        event['summary'] += event['start'].strftime(' (%Y-%m-%d)')
+        leader = ' ' + prefs.prefs['vert'] + ' '
+        ret += misc.format_left(event['summary'],
+            leader=leader,
+            firstline=days_until(event) + leader)
+
+    countdowns = []
+    for cal in countdown_cals:
+        eventsResult = service.events().list(
+            calendarId=cal['id'], singleEvents=True, orderBy='updated',
+            timeMin=today.isoformat(),
+            maxResults=prefs.prefs['calendar']['max_countdowns']).execute()
+        events = eventsResult.get('items', [])
+        for event in events:
+            countdowns.append(event_times(event))
+
+    if len(countdowns) is 0:
+        return ''
+
+    countdowns = sorted(countdowns, key=lambda k: k['start'])
+
+    left_width = days_until(countdowns[0])
+
+    for countdown in countdowns:
+        add_countdown(countdown)
+
+    return ret.rstrip()
+
 def events():
-    Event = namedtuple('Event', ['start', 'end', 'duration', 'info'])
     today, tomorrow = today_times()
 
     events = today_events()
     alldays = []
     todays = []
     for event in events:
-        start, end, duration = event_times(event)
-        if start <= today and end >= tomorrow:
-            alldays.append(Event(
-                start=start, end=end, duration=duration, info=event))
+        event = event_times(event)
+        if event['start'] <= today and event['end'] >= tomorrow:
+            alldays.append(event)
         else:
-            todays.append(Event(
-                start=start, end=end, duration=duration, info=event))
+            todays.append(event)
 
     out = ''
     def format_event(time, event):
         nonlocal out
-        leader_visual = ' | '
-        margin = len(time) + len(leader_visual)
-        leader = ' ' * (margin - len(leader_visual))
-        width = prefs.prefs['width'] - margin
-        if time == 'all day' and event.duration.days > 1:
-            event.info['summary'] += (
-                f' (day {(today - event.start).days} '
-                f'of {(event.end - event.start).days})')
-        summary = textwrap.wrap(
-            event.info['summary'], width=width)
-        out += f'{time}{leader_visual}{summary.pop(0)}\n'
-        for line in summary:
-            out += (f'{leader}{leader_visual}{line}\n')
+        leader = ' ' + prefs.prefs['vert'] + ' '
+        if time == 'all day' and event['duration'].days > 1:
+            event['summary'] += (' (day '
+                + str((today - event['start']).days) + ' of '
+                + str((event['end'] - event['start']).days) + ')')
+
+        out += misc.format_left(event['summary'],
+            leader=leader, firstline=time + leader)
 
     for event in alldays:
         format_event('all day', event)
@@ -137,9 +202,9 @@ def events():
     out += misc.hrule() + '\n'
 
     for event in todays:
-        format_event(hours(event.start), event)
+        format_event(hours(event['start']), event)
 
-    return out
+    return out.rstrip()
 
 def today_date():
     return 'today is ' + today_times()[0].strftime('%A, %B %d').lower()
