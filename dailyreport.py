@@ -8,6 +8,7 @@ import prefs
 import weather
 import dates
 import misc
+import twtr
 
 def main():
     parser = argparse.ArgumentParser(
@@ -36,15 +37,23 @@ def main():
     # by passing functions we don't evaluate unless included in
     # prefs['format'] --- no weather api calls if you don't want weather, etc.
     replacements = {
-        ('{hrule}',          misc.hrule),
-        ('{today}',          dates.today_date),
-        ('{iso_date}',       dates.iso_date),
-        ('{short_forecast}', weather.forecast),
-        ('{weather_graph}',  weather.graph),
-        ('{calendar}',       dates.events),
-        ('{countdown}',      dates.today_countdowns),
-        ('{todo}',           dates.today_todos),
+        ('hrule',          misc.hrule),
+        ('today',          dates.today_date),
+        ('iso_date',       dates.iso_date),
+        ('short_forecast', weather.forecast),
+        ('weather_graph',  weather.graph),
+        ('calendar',       dates.events),
+        ('countdown',      dates.today_countdowns),
+        ('todo',           dates.today_todos),
+        ('twitter',        twtr.last)
     }
+
+    # valid:
+    # {xxx:(...)}
+    #    or
+    # {xxx}
+    # literal:
+    # {{xxx}}
 
     for replacement, fn in replacements:
         replace(replacement, fn)

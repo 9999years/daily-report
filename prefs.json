@@ -13,7 +13,9 @@
 		"{todo}",
 		"{hrule}",
 		"{countdown}",
-		"\n"
+		"{hrule}",
+		"{twitter:('dril')}",
+		"\n\n"
 	],
 	"location": {
 		"state": "va",
@@ -31,7 +33,7 @@
 		"chars": {
 			"precip": "·",
 			"temp": "×",
-			"both": "O"
+			"both": "ø"
 		}
 	},
 	"calendar": {

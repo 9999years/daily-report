@@ -38,5 +38,11 @@ Potential usage with `cron`, to print daily at 6am:
 `keys.json` should have the following keys:
 
 * [`wunderground`][wundeground]
+* [`twitter`][twitter], which should contain:
+    * `consumer_key`
+    * `consumer_secret`
+    * `access_token`
+    * `access_token_secret`
 
 [wundeground]: https://www.wunderground.com/weather/api
+[twitter]: https://apps.twitter.com/app/new
