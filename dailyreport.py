@@ -1,6 +1,7 @@
 #! /usr/local/bin/python3
 import argparse
 from sys import stdout
+import re
 
 # local imports
 import gen_credentials as creds
