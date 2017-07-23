@@ -11,16 +11,7 @@ import dates
 import misc
 import twtr
 
-def report():
-    parser = argparse.ArgumentParser(
-        description='Generates a daily report'
-    )
-
-    parser.add_argument('-e', '--encoding',  type=str, default='utf-8',
-        help='Output encoding. Default is UTF-8.')
-
-    args = parser.parse_args()
-
+def report(args=None):
     prefs.get_prefs()
 
     msg = '\n'.join(prefs.prefs['format'])
@@ -68,6 +59,15 @@ def report():
     return msg
 
 def main():
+    parser = argparse.ArgumentParser(
+        description='Generates a daily report'
+    )
+
+    parser.add_argument('-e', '--encoding',  type=str, default='utf-8',
+        help='Output encoding. Default is UTF-8.')
+
+    args = parser.parse_args()
+
     msg = report()
     stdout.buffer.write(msg.encode(args.encoding, errors='replace'))
 
