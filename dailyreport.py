@@ -26,7 +26,7 @@ def main():
 
     def replace(txt, replacement):
         nonlocal msg
-        txt = f'{{{txt}}}'
+        txt = '{' + txt + '}'
         if txt in msg:
             if callable(replacement):
                 # function for lazy eval.
@@ -49,6 +49,7 @@ def main():
         ('twitter',        twtr.last)
     }
 
+    # not implemented:
     # valid:
     # {xxx:(...)}
     #    or
@@ -58,6 +59,10 @@ def main():
 
     for replacement, fn in replacements:
         replace(replacement, fn)
+
+    # empty sections surrounded by hrules can look silly
+    # make them one hrule instead
+    re.sub('(' + misc.hrule() + r'\s*){2,}', misc.hrule() + '\n', msg)
 
     stdout.buffer.write(msg.encode(args.encoding, errors='replace'))
 
