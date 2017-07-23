@@ -4,6 +4,7 @@ import requests
 from urllib import parse as urlparse
 from collections import namedtuple
 import os
+from time import sleep
 
 import prefs
 import misc
@@ -15,9 +16,18 @@ def api_url(endpoint):
         + endpoint
         + '/q/{state}/{city}.json'.format_map(prefs.prefs['location']))
 
-def weather(endpoint):
+def weather(endpoint, retries=2):
     url = api_url(endpoint)
-    r = requests.get(url)
+
+    # request and retry up to `retries` times
+    for i in range(retries):
+        r = requests.get(url)
+        if r.status_code == requests.codes.ok:
+            break
+        else:
+            # wait a second --- don't hammer the api
+            sleep(1)
+
     return r.json()
 
 def graph():
@@ -78,7 +88,12 @@ def graph():
 
     for i, moment in enumerate(moments):
         odd = i % time_rows
+        i_orig = i
         i = int(i * step + margin)
+        time_num = moment.time[:-2]
+        if int(time_num) % 12 == 0:
+            for j in range(height):
+                place(prefs.prefs['vert_light'], i, j)
         temp_y = int(misc.scale(
             moment.temp, temp_min, temp_max, 0, height - 1))
         place(chars['temp'], i, temp_y)
@@ -89,7 +104,6 @@ def graph():
         else:
             place(chars['precip'], i, precip_y)
 
-        time_num = moment.time[:-2]
         place(time_num, i, height + odd)
 
     return '\n'.join(graph)

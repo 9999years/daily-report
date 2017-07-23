@@ -13,7 +13,7 @@
 		"{todo}",
 		"{hrule}",
 		"{countdown}",
-		"\n\n"
+		"\n\n\n"
 	],
 	"location": {
 		"state": "va",
@@ -25,7 +25,9 @@
 	"api_keys": "keys.json",
 	"width": 32,
 	"horiz": "-",
+	"horiz_light": "·",
 	"vert": "|",
+	"vert_light": "|",
 	"weather": {
 		"height": 6,
 		"chars": {
