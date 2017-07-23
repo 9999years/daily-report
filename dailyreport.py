@@ -11,7 +11,7 @@ import dates
 import misc
 import twtr
 
-def main():
+def report():
     parser = argparse.ArgumentParser(
         description='Generates a daily report'
     )
@@ -63,8 +63,12 @@ def main():
 
     # empty sections surrounded by hrules can look silly
     # make them one hrule instead
-    re.sub('(' + misc.hrule() + r'\s*){2,}', misc.hrule() + '\n', msg)
+    msg = re.sub('(' + misc.hrule() + r'\s*){2,}', misc.hrule() + '\n', msg)
 
+    return msg
+
+def main():
+    msg = report()
     stdout.buffer.write(msg.encode(args.encoding, errors='replace'))
 
 if __name__ == '__main__':
