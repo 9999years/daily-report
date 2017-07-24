@@ -13,23 +13,23 @@
 		"{todo}",
 		"{hrule}",
 		"{countdown}",
-		"{hrule}",
-		"{twitter}",
-		"\n\n"
+		"\n\n\n"
 	],
 	"location": {
 		"state": "va",
 		"city": "reston"
 	},
 	"google_key_path": "google_keys.json",
-	"credential_path": "google_credentials.json",
+	"google_credential_path": "google_credentials.json",
 	"app_name": "the daily report",
 	"api_keys": "keys.json",
 	"width": 32,
 	"horiz": "-",
+	"horiz_light": "·",
 	"vert": "|",
+	"vert_light": "|",
 	"weather": {
-		"height": 10,
+		"height": 6,
 		"chars": {
 			"precip": "·",
 			"temp": "×",
