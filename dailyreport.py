@@ -54,7 +54,7 @@ def report(args=None):
 
     # empty sections surrounded by hrules can look silly
     # make them one hrule instead
-    msg = re.sub('(' + misc.hrule() + r'\s*){2,}', misc.hrule() + '\n', msg)
+    msg = re.sub('(' + misc.hrule() + r'\n*){2,}', misc.hrule() + '\n', msg)
 
     return msg
 
