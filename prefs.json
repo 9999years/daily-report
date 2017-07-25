@@ -31,7 +31,7 @@
 	"weather": {
 		"height": 6,
 		"chars": {
-			"precip": "○",
+			"precip": "·",
 			"temp":   "×",
 			"both":   "¤"
 		}
