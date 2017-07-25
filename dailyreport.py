@@ -10,6 +10,7 @@ import weather
 import dates
 import misc
 import twtr
+import uni2esky
 
 def report(args=None):
     prefs.get_prefs()
@@ -54,7 +55,7 @@ def report(args=None):
 
     # empty sections surrounded by hrules can look silly
     # make them one hrule instead
-    msg = re.sub('(' + misc.hrule() + r'\s*){2,}', misc.hrule() + '\n', msg)
+    msg = re.sub('(' + misc.hrule() + r'\n*){2,}', misc.hrule() + '\n', msg)
 
     return msg
 
@@ -63,13 +64,19 @@ def main():
         description='Generates a daily report'
     )
 
-    parser.add_argument('-e', '--encoding',  type=str, default='utf-8',
+    parser.add_argument('-e', '--encoding', type=str, default='utf-8',
         help='Output encoding. Default is UTF-8.')
+
+    parser.add_argument('-p', '--print', action='store_true',
+        help='Printing output --- converts codepoints to Esky escapes.')
 
     args = parser.parse_args()
 
     msg = report()
-    stdout.buffer.write(msg.encode(args.encoding, errors='replace'))
+    if args.print:
+        stdout.buffer.write(uni2esky.encode(msg))
+    else:
+        stdout.buffer.write(msg.encode(args.encoding, errors='replace'))
 
 if __name__ == '__main__':
     main()
