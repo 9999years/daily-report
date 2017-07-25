@@ -65,7 +65,7 @@ def main():
     )
 
     parser.add_argument('-e', '--encoding', type=str, default='utf-8',
-        help='Output encoding. Default is UTF-8.')
+        help='Output encoding. Default is UTF-8. Irrelevant with --print')
 
     parser.add_argument('-p', '--print', action='store_true',
         help='Printing output --- converts codepoints to Esky escapes.')
@@ -74,7 +74,8 @@ def main():
 
     msg = report()
     if args.print:
-        stdout.buffer.write(uni2esky.encode(msg))
+        msg = b'\x1b\x33\x18' + uni2esky.encode(msg)
+        stdout.buffer.write(msg)
     else:
         stdout.buffer.write(msg.encode(args.encoding, errors='replace'))
 
