@@ -15,7 +15,7 @@ def enc(txt):
 
 def char_encode(char):
     cp = ord(char)
-    if cp < 80:
+    if cp < 0x80:
         return char.encode(encoding)
     elif cp in map.chars:
         page, pos = map.chars[cp]
