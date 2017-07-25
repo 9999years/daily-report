@@ -16,23 +16,23 @@ def credentials(prefs):
     Returns:
         Credentials, the obtained credential.
     """
-    cred_path = os.path.abspath(prefs['credential_path'])
-    store = oauth.file.Storage(prefs['credential_path'])
+    cred_path = os.path.abspath(prefs.prefs['google_credential_path'])
+    store = oauth.file.Storage(prefs.prefs['google_credential_path'])
     credentials = store.get()
     if not credentials or credentials.invalid:
         flow = oauth.client.flow_from_clientsecrets(
-            prefs['google_key_path'], prefs['calendar']['scope']
+            prefs.prefs['google_key_path'], prefs.prefs['calendar']['scope']
         )
-        flow.user_agent = prefs['app_name']
-        credentials = oauth.tools.run_flow(flow, store, flags)
+        flow.user_agent = prefs.prefs['app_name']
+        credentials = oauth.tools.run_flow(flow, store, None)
         print('Storing credentials')
     return credentials
 
 def build_creds(api='calendar', version='v3'):
-    creds = credentials(prefs.prefs)
+    creds = credentials(prefs)
     http = creds.authorize(httplib2.Http())
     service = discovery.build(api, 'v3', http=http)
     return creds, http, service
 
-if __name__ is '__main__':
-    print(credentials())
+if __name__ == '__main__':
+    print(credentials(prefs))
