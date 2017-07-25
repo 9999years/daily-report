@@ -24,16 +24,16 @@
 	"app_name": "the daily report",
 	"api_keys": "keys.json",
 	"width": 32,
-	"horiz": "-",
-	"horiz_light": "·",
-	"vert": "|",
-	"vert_light": "|",
+	"horiz": "═",
+	"horiz_light": "─",
+	"vert": "║",
+	"vert_light": "│",
 	"weather": {
 		"height": 6,
 		"chars": {
-			"precip": "·",
-			"temp": "×",
-			"both": "ø"
+			"precip": "○",
+			"temp":   "×",
+			"both":   "¤"
 		}
 	},
 	"calendar": {
