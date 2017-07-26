@@ -173,8 +173,15 @@ def main():
     parser = argparse.ArgumentParser(description='generates mazes')
     parser.add_argument('width', default=32, type=int)
     parser.add_argument('height', default=64, type=int)
+    parser.add_argument('-p', '--print', action='store_true')
     args = parser.parse_args()
-    print(gen(args.width, args.height))
+    if args.print:
+        from sys import stdout.buffer.write
+        import uni2esky
+        write(b'\x1b\x33\x18'
+            + uni2esky.encode(gen(args.width, args.height))
+    else:
+        print(gen(args.width, args.height))
 
 if __name__ == '__main__':
     main()
