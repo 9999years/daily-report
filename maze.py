@@ -70,9 +70,12 @@ class Cell():
             + int(right.bottom) * east)
 
 def gen(w, h):
+    if h <= 3 or w <= 3:
+        return 'maze width and height MUST be ≥3'
+
     maze = ''
 
-    width  = int(w / 2 + 2)
+    width  = int(w / 2 + 1)
     height = int(h)
 
     # map[x][y]
