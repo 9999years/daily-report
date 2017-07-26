@@ -70,7 +70,7 @@ class Cell():
             + int(right.bottom) * east)
 
 def gen(w, h):
-    if h <= 3 or w <= 3:
+    if h < 3 or w < 3:
         return 'maze width and height MUST be ≥3'
 
     width  = int(w / 2 + 1)
@@ -175,13 +175,22 @@ def main():
     parser.add_argument('height', default=64, type=int)
     parser.add_argument('-p', '--print', action='store_true')
     args = parser.parse_args()
+
+    w = args.width
+    h = args.height
+
+    if w < 4:
+        w = 4
+    if h < 4:
+        h = 4
+
     if args.print:
-        from sys import stdout.buffer.write
+        from sys import stdout
         import uni2esky
-        write(b'\x1b\x33\x18'
-            + uni2esky.encode(gen(args.width, args.height))
+        stdout.buffer.write(b'\x1b\x33\x18'
+            + uni2esky.encode(gen(w, h)))
     else:
-        print(gen(args.width, args.height))
+        print(gen(w, h))
 
 if __name__ == '__main__':
     main()
