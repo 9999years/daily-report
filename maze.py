@@ -161,7 +161,7 @@ def gen(w, h):
     if 'start' in prefs.prefs['maze']:
         ret = prefs.prefs['maze']['start'] + ret[1:]
     if 'end' in prefs.prefs['maze']:
-        ret = ret[:-3] + prefs.prefs['maze']['end']
+        ret = ret[:-3] + prefs.prefs['maze']['end'] + '\n'
 
     return ret
 
