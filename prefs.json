@@ -45,6 +45,8 @@
 		"max_countdowns": 10
 	},
 	"maze": {
-		"height": 10
+		"height": 10,
+		"style": "random",
+		"halves": false
 	}
 }

@@ -41,7 +41,7 @@ def report(args=None):
         ('countdown',      dates.today_countdowns),
         ('todo',           dates.today_todos),
         ('twitter',        twtr.last),
-        ('maze',           maze.simple),
+        ('maze',           maze.from_prefs),
     }
 
     # not implemented:

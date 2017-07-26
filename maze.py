@@ -1,131 +1,173 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#! /usr/local/bin/python3
 
-#Maze Generator using unicode line drawing chars
-#by Vidar 'koala_man' Holen
-#www.vidarholen.net
+# heavily modified, but original algs by Vidar 'koala_man' Holen
+# vidarholen.net
+# http://www.vidarholen.net/~vidar/generatemaze.py
 
-#See the online demo on 
-#http://www.vidarholen.net/~vidar/generatemaze.py
+import random
+import prefs
 
-from random import *
-from sys import *
-
-picwidth=20
-picheight=20
-if len(argv)>1:
-    picwidth=int(argv[1])
-    if len(argv)>2:
-        picheight=int(argv[2])
-        
-width=picwidth #(picwidth)/2+1
-height=picheight #(picheight)/2+1
-
-#print "Generating %dx%d maze" % (width,height)
-
-map=[] # map[x][y]
-for i in range(width):
-    n=[]
-    for j in range(height):
-        n.append([1,1,0,0,0]) #right, bottom, captured, backtrack, color
-    map.append(n)
-    
-for y in range(height):
-    map[0][y]=[1,0,1,0,0];
-    map[width-1][y]=[1,0,1,0,0];
-
-for x in range(width):
-    map[x][0]=[0,1,1,0,0]
-    map[x][height-1]=[0,1,1,0,0]
-
-map[0][0]=[0,0,1,0,0]
-map[width-1][0]=[0,0,1,0,0]
+# so we can deal with directions with binary addition / subtraction
+# north and south = north + south or north | south yknow that kinda deal
+north = 0b1000
+east  = 0b0001
+south = 0b0010
+west  = 0b0100
 
 
-playerstart=(1,1)
-playerexit=(width-1,height-1)
-mazestart=playerstart
+def maze_char(directions):
+    chars = [
+        [' ', ' '], # 0
+        ['╶', '╶'], # r
+        ['╷', '╷'], # d
+        ['╭', '┌'], # r | d
+        ['╴', '╴'], # l
+        ['─', '─'], # l | r
+        ['╮', '┐'], # l | d
+        ['┬', '┬'], # l | r | d
+        ['╵', '╵'], # u
+        ['╰', '└'], # u | r
+        ['│', '│'], # u | d
+        ['├', '├'], # u | d | r
+        ['╯', '┘'], # u | l
+        ['┴', '┴'], # u | l | r
+        ['┤', '┤'], # u | l | d
+        ['┼', '┼'], # u | l | d | r
+    ]
+    if prefs.prefs['maze']['style'] == 'round':
+        chars = [k[0] for k in chars]
+    elif prefs.prefs['maze']['style'] == 'square':
+        chars = [k[1] for k in chars]
+    elif prefs.prefs['maze']['style'] == 'random':
+        chars = [k[random.randint(0, 1)] for k in chars]
+    else:
+        chars = [chr(random.randint(0x2500, 0x27ff)) for k in chars]
 
-x,y=mazestart
-backtrack=1
-captures=0
-solutiontrack=0
+    if prefs.prefs['maze']['halves'] == False:
+        chars[north] = chars[south] = '│'
+        chars[east] = chars[west] = '─'
 
-while 1:
-    if (x,y)==playerexit:
-        solutiontrack=backtrack
+    return chars[directions]
 
-    if solutiontrack>0 and solutiontrack==map[x][y][3]:
-        solutiontrack=solutiontrack-1
-        map[x][y][4]=2
 
-    if map[x][y][2]==0:
-        map[x][y][2]=1
-        captures=captures+1
-        if captures%10000==0:
-            print >> stderr, 100*captures/(width*height), "%" 
+class Cell():
+    def __init__(self,
+            right=True,
+            bottom=True,
+            captured=False,
+            backtrack=0,
+            solution=False):
+        self.right     = right
+        self.bottom    = bottom
+        self.captured  = captured
+        self.backtrack = backtrack
+        self.solution  = solution
 
-#    map[x][y][2]=1 
-    map[x][y][3]=backtrack
-    possibilities=[]
-    for a,b in [(x+1,y),(x-1,y),(x,y+1),(x,y-1)]:
-        if a>=0 and a<width and b>=0 and b<height:
-            if map[a][b][2]==0:
-                possibilities.append((a,b))
+    def directions(self, right, bottom):
+        return (int(self.right) * north
+            + int(self.bottom)  * west
+            + int(bottom.right) * south
+            + int(right.bottom) * east)
 
-    if len(possibilities)==0:
-        map[x][y][3]=0
-        backtrack=backtrack-1
-        if backtrack==0:
-            break
-        for a,b in [(x+1,y),(x-1,y),(x,y+1),(x,y-1),(-1,-1)]:
-            if a>=0 and a<width and b>=0 and b<height:
-                if map[a][b][3]==backtrack:
-                    break
-                
-        x=a
-        y=b
-        continue
-    
-    pos=randint(0,len(possibilities)-1)
-    a,b=possibilities[pos]
-    if a<x: map[a][b][0]=0
-    if a>x: map[x][y][0]=0
-    if b<y: map[a][b][1]=0
-    if b>y: map[x][y][1]=0
-    x=a
-    y=b
-    backtrack=backtrack+1
- 
-print >> stderr, "Done,", captures, "visited"
+def gen(w, h):
+    maze = ''
 
-pixmap=[] 
-for i in range(width):
-    pixmap.append([0]*height)
+    width  = int(w / 2 + 2)
+    height = int(h)
 
-#chars=[' ','╶','╷','╭','╴','─','╮','┬','╵','╰','│','├','╯','┴','┤','┼']
-chars=[' ','╶','╷','┌','╴','─','┐','┬','╵','└','│','├','┘','┴','┤','┼']
+    # map[x][y]
+    map = [[Cell() for y in range(height)] for x in range(w)]
 
-for y in range(0,height-1):
-    for x in range(0,width-1):
-        u=map[x][y][0]
-        l=map[x][y][1]
-        d=map[x][y+1][0]
-        r=map[x+1][y][1]
-        char=u*8+l*4+d*2+r;
-        stdout.write(chars[char])
-        if r==0:
-            stdout.write(chars[0]);
-        else:
-            stdout.write(chars[5]);
-    stdout.write('\n')
+    for y in range(height):
+        map[width - 1][y].bottom   = map[0][y].bottom   = False
+        map[width - 1][y].captured = map[0][y].captured = True
 
-exit(0)
-for y in range(-1,picheight):
-    for x in range(-1,picwidth):
-        n=pixmap[x][y]
-        if n==0: stdout.write('\xFF\xFF\xFF')
-        elif n==1: stdout.write('\x00\x00\x00')
-        elif n==2: stdout.write('\xFF\xFF\xFF') #show solution
-        elif n==3: stdout.write('\x00\x00\xFF')
-        else: stdout.write('\xFF\x00\xFF')
+    for x in range(width):
+        map[x][height - 1].right    = map[x][0].right = False
+        map[x][height - 1].captured = map[x][0].captured = True
+
+    map[width - 1][0].right = map[0][0].right = map[0][0].bottom = False
+    map[width - 1][0].captured = map[0][0].captured = True
+
+    start = (1, 1)
+    exit = (width - 1, height - 1)
+
+    x, y = start
+    backtrack = 1
+    captures = 0
+    solutiontrack = 0
+
+    while True:
+        if (x, y) == exit:
+            solutiontrack = backtrack
+
+        if solutiontrack > 0 and solutiontrack == map[x][y][3]:
+            solutiontrack -= 1
+            map[x][y].solution = True
+
+        if map[x][y].captured == False:
+            map[x][y].captured = True
+            captures += 1
+
+        map[x][y].backtrack = backtrack
+        possibilities = []
+        for a, b in [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]:
+            if a >= 0 and a < width and b >= 0 and b<height:
+                if map[a][b].captured == False:
+                    possibilities.append((a, b))
+
+        if len(possibilities) == 0:
+            map[x][y].backtrack = 0
+            backtrack -= 1
+            if backtrack == 0:
+                break
+            for a, b in [
+                    (x + 1, y    ),
+                    (x - 1, y    ),
+                    (x,     y + 1),
+                    (x,     y - 1),
+                    (-1,    -1   ),
+                ]:
+                if a >= 0 and a < width and b >= 0 and b<height:
+                    if map[a][b].backtrack == backtrack:
+                        break
+
+            x = a
+            y = b
+            continue
+
+        pos = random.randint(0, len(possibilities) - 1)
+        a, b = possibilities[pos]
+        if a < x: map[a][b].right  = False
+        if a > x: map[x][y].right  = False
+        if b < y: map[a][b].bottom = False
+        if b > y: map[x][y].bottom = False
+        x = a
+        y = b
+        backtrack = backtrack + 1
+
+    for y in range(0, height - 1):
+        for x in range(0, width - 1):
+            dir = map[x][y].directions(right=map[x + 1][y], bottom=map[x][y + 1])
+            maze += maze_char(dir)
+            if dir & east == 0:
+                maze += maze_char(0)
+            else:
+                maze += maze_char(east | west)
+        maze += '\n'
+
+    return maze
+
+def from_prefs():
+    return gen(prefs.prefs['width'], prefs.prefs['maze']['height'])
+
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description='generates mazes')
+    parser.add_argument('width', default=32, type=int)
+    parser.add_argument('height', default=64, type=int)
+    args = parser.parse_args()
+    print(gen(args.width, args.height))
+
+if __name__ == '__main__':
+    main()
