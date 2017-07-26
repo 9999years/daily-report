@@ -11,6 +11,7 @@ import dates
 import misc
 import twtr
 import uni2esky
+import maze
 
 def report(args=None):
     prefs.get_prefs()
@@ -39,7 +40,8 @@ def report(args=None):
         ('calendar',       dates.events),
         ('countdown',      dates.today_countdowns),
         ('todo',           dates.today_todos),
-        ('twitter',        twtr.last)
+        ('twitter',        twtr.last),
+        ('maze',           maze.simple),
     }
 
     # not implemented:

@@ -13,6 +13,7 @@
 		"{todo}",
 		"{hrule}",
 		"{countdown}",
+		"{maze}",
 		"\n\n\n"
 	],
 	"location": {
@@ -42,5 +43,8 @@
 		"countdown_pat": "count.?downs?",
 		"todo_check": "[] ",
 		"max_countdowns": 10
+	},
+	"maze": {
+		"height": 10
 	}
 }

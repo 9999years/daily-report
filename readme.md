@@ -93,7 +93,7 @@ Twitter      |A Lot
 
 ## Google
 
-Ah, Google. The blue beast. Anyways, to get some Google credentials you'll need
+Ah, Google. The Blue Beast. Anyways, to get some Google credentials you'll need
 to do a few things.
 
 1. [Create a project][proj] in the Google Cloud Platform. There's a quota of
@@ -109,7 +109,7 @@ to do a few things.
    `prefs.json` is.
 4. Run `gen_credentials.py`, which will open your default browser, prompting
    you to log in. This generates the second set of OAuth keys, stored in
-   `google_credentials.json` (`prefs.google_credential_path`).
+   `google_credentials.json` (`prefs.google_credential_path`). You’re done!
 
 [wunderground]: https://www.wunderground.com/weather/api
 [twitter]: https://apps.twitter.com/app/new
