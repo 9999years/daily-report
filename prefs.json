@@ -47,6 +47,8 @@
 	"maze": {
 		"height": 10,
 		"style": "random",
-		"halves": false
+		"halves": false,
+		"start": "S",
+		"end": "E"
 	}
 }

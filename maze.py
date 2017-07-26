@@ -73,24 +73,22 @@ def gen(w, h):
     if h <= 3 or w <= 3:
         return 'maze width and height MUST be ≥3'
 
-    maze = ''
-
     width  = int(w / 2 + 1)
     height = int(h)
 
-    # map[x][y]
-    map = [[Cell() for y in range(height)] for x in range(w)]
+    # maze[x][y]
+    maze = [[Cell() for y in range(height)] for x in range(w)]
 
     for y in range(height):
-        map[width - 1][y].bottom   = map[0][y].bottom   = False
-        map[width - 1][y].captured = map[0][y].captured = True
+        maze[width - 1][y].bottom   = maze[0][y].bottom   = False
+        maze[width - 1][y].captured = maze[0][y].captured = True
 
     for x in range(width):
-        map[x][height - 1].right    = map[x][0].right = False
-        map[x][height - 1].captured = map[x][0].captured = True
+        maze[x][height - 1].right    = maze[x][0].right = False
+        maze[x][height - 1].captured = maze[x][0].captured = True
 
-    map[width - 1][0].right = map[0][0].right = map[0][0].bottom = False
-    map[width - 1][0].captured = map[0][0].captured = True
+    maze[width - 1][0].right = maze[0][0].right = maze[0][0].bottom = False
+    maze[width - 1][0].captured = maze[0][0].captured = True
 
     start = (1, 1)
     exit = (width - 1, height - 1)
@@ -104,23 +102,23 @@ def gen(w, h):
         if (x, y) == exit:
             solutiontrack = backtrack
 
-        if solutiontrack > 0 and solutiontrack == map[x][y][3]:
+        if solutiontrack > 0 and solutiontrack == maze[x][y][3]:
             solutiontrack -= 1
-            map[x][y].solution = True
+            maze[x][y].solution = True
 
-        if map[x][y].captured == False:
-            map[x][y].captured = True
+        if maze[x][y].captured == False:
+            maze[x][y].captured = True
             captures += 1
 
-        map[x][y].backtrack = backtrack
+        maze[x][y].backtrack = backtrack
         possibilities = []
         for a, b in [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]:
-            if a >= 0 and a < width and b >= 0 and b<height:
-                if map[a][b].captured == False:
+            if a >= 0 and a < width and b >= 0 and b < height:
+                if maze[a][b].captured == False:
                     possibilities.append((a, b))
 
         if len(possibilities) == 0:
-            map[x][y].backtrack = 0
+            maze[x][y].backtrack = 0
             backtrack -= 1
             if backtrack == 0:
                 break
@@ -131,8 +129,8 @@ def gen(w, h):
                     (x,     y - 1),
                     (-1,    -1   ),
                 ]:
-                if a >= 0 and a < width and b >= 0 and b<height:
-                    if map[a][b].backtrack == backtrack:
+                if a >= 0 and a < width and b >= 0 and b < height:
+                    if maze[a][b].backtrack == backtrack:
                         break
 
             x = a
@@ -141,25 +139,31 @@ def gen(w, h):
 
         pos = random.randint(0, len(possibilities) - 1)
         a, b = possibilities[pos]
-        if a < x: map[a][b].right  = False
-        if a > x: map[x][y].right  = False
-        if b < y: map[a][b].bottom = False
-        if b > y: map[x][y].bottom = False
+        if a < x: maze[a][b].right  = False
+        if a > x: maze[x][y].right  = False
+        if b < y: maze[a][b].bottom = False
+        if b > y: maze[x][y].bottom = False
         x = a
         y = b
         backtrack = backtrack + 1
 
+    ret = ''
     for y in range(0, height - 1):
         for x in range(0, width - 1):
-            dir = map[x][y].directions(right=map[x + 1][y], bottom=map[x][y + 1])
-            maze += maze_char(dir)
+            dir = maze[x][y].directions(right=maze[x + 1][y], bottom=maze[x][y + 1])
+            ret += maze_char(dir)
             if dir & east == 0:
-                maze += maze_char(0)
+                ret += maze_char(0)
             else:
-                maze += maze_char(east | west)
-        maze += '\n'
+                ret += maze_char(east | west)
+        ret += '\n'
 
-    return maze
+    if 'start' in prefs.prefs['maze']:
+        ret = prefs.prefs['maze']['start'] + ret[1:]
+    if 'end' in prefs.prefs['maze']:
+        ret = ret[:-3] + prefs.prefs['maze']['end']
+
+    return ret
 
 def from_prefs():
     return gen(prefs.prefs['width'], prefs.prefs['maze']['height'])
