@@ -8,7 +8,7 @@
 		"{conditions}",
 		"{sun}",
 		"{moon}",
-		"{tmrw_short_forecast}",
+		"{tmrw_forecast}",
 		"{tmrw_conditions}",
 		"{hrule}",
 		"{weather_graph}",
@@ -44,7 +44,7 @@
 		"tomorrow_prefix": "tomorrow: ",
 		"moon_bright": "●",
 		"moon_dark": "○",
-		"forecast_format": "{prefix}{low}-{high}°F, {precip}%op\n{conds}",
+		"forecast_format": "{prefix}{low}-{high}°F, {precip}%op",
 		"temp": "fahrenheit"
 	},
 	"calendar": {

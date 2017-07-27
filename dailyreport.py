@@ -33,6 +33,7 @@ def report(args=None):
     # prefs['format'] --- no weather api calls if you don't want weather, etc.
     replacements = {
         ('hrule',            misc.hrule),
+        ('thinhrule',        misc.thinhrule),
         ('today',            dates.today_date),
         ('iso_date',         dates.iso_date),
         ('forecast',         weather.today_forecast),

@@ -164,7 +164,7 @@ def suntimes():
     daylight = settime - risetime
     return misc.align(
         misc.hourminute(risetime) + ' rise',
-        misc.formatdelta(daylight),
+        misc.formatdelta(daylight, clock=24),
         misc.hourminute(settime) + ' set',
         prefs.prefs['width'])
 
