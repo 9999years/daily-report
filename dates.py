@@ -199,7 +199,7 @@ def events():
     for event in alldays:
         format_event('all day', event)
 
-    out += misc.hrule() + '\n'
+    out += misc.thinhrule() + '\n'
 
     for event in todays:
         format_event(hours(event['start']), event)

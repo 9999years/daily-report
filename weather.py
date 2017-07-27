@@ -170,12 +170,13 @@ def suntimes():
 
 def moon():
     times = weather('astronomy')['moon_phase']
+    phase = times['phaseofMoon']
+    percent = times['percentIlluminated']
     graphic = (prefs.prefs['weather']['moon_bright']
         if int(times['percentIlluminated']) > 50
         else prefs.prefs['weather']['moon_dark'])
 
-    return misc.center(
-        '{phaseofMoon} @ {percentIlluminated}%'.format(**times).lower())
+    return misc.center(f'{graphic} {phase.lower()} @ {percent}%')
 
 def main():
     forecast()

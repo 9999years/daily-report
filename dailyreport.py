@@ -63,7 +63,13 @@ def report(args=None):
 
     # empty sections surrounded by hrules can look silly
     # make them one hrule instead
-    msg = re.sub('(' + misc.hrule() + r'\n*){2,}', misc.hrule() + '\n', msg)
+    # replace multiple thin hrules with one thinhrule
+    msg = re.sub('((' + misc.thinhrule() + r')\n*){2,}',
+        misc.thinhrule() + '\n', msg)
+    # but all regular hrules or mixed thin/regular hrules turn into regular
+    # hrules
+    msg = re.sub('((' + misc.hrule() + '|' + misc.thinhrule() + r')\n*){2,}',
+        misc.hrule() + '\n', msg)
 
     return msg
 

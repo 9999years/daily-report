@@ -9,7 +9,7 @@ def left_pad(txt, width=prefs.prefs['width'], char=' '):
 def hrule():
     return prefs.prefs['horiz'] * prefs.prefs['width']
 
-def hrule():
+def thinhrule():
     return prefs.prefs['horiz_light'] * prefs.prefs['width']
 
 def lerp(min, max, amt):
@@ -37,13 +37,13 @@ def format_left(txt, leader='',
     return out
 
 def center(txt, width=prefs.prefs['width'], char=' '):
-    spc = width - len(txt)
+    spc = (width - len(txt)) / 2
     if isinstance(spc, int):
         return char * spc + txt + char * spc
     else:
         # (not an even amt of space)
-        spc = int(space)
-        return chr * spc + txt + char * (spc + 1)
+        spc = int(spc)
+        return char * spc + txt + char * (spc + 1)
 
 def align(left='', center='', right='', width=prefs.prefs['width']):
     """
