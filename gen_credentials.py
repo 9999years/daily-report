@@ -16,12 +16,12 @@ def credentials(prefs):
     Returns:
         Credentials, the obtained credential.
     """
-    cred_path = os.path.abspath(prefs.prefs['google_credential_path'])
-    store = oauth.file.Storage(prefs.prefs['google_credential_path'])
+    cred_path = os.path.abspath(prefs.fname('google_credential_path'))
+    store = oauth.file.Storage(cred_path)
     credentials = store.get()
     if not credentials or credentials.invalid:
         flow = oauth.client.flow_from_clientsecrets(
-            prefs.prefs['google_key_path'], prefs.prefs['calendar']['scope']
+            prefs.fname('google_key_path'), prefs.prefs['calendar']['scope']
         )
         flow.user_agent = prefs.prefs['app_name']
         credentials = oauth.tools.run_flow(flow, store, None)
