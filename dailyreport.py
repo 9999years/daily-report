@@ -2,6 +2,7 @@
 import argparse
 from sys import stdout
 import re
+import uni2esky
 
 # local imports
 import gen_credentials as creds
@@ -10,7 +11,6 @@ import weather
 import dates
 import misc
 import twtr
-import uni2esky
 import maze
 
 def report(args=None):
