@@ -9,14 +9,22 @@ from time import sleep
 import prefs
 import misc
 
+# dict of runtime caches, to avoid double requests
+cache = {}
+
 def api_url(endpoint):
     return ('https://api.wunderground.com/api/'
         + prefs.keys['wunderground']
         + '/'
         + endpoint
-        + '/q/{state}/{city}.json'.format_map(prefs.prefs['location']))
+        + '/q/{location}.json'.format_map(prefs.prefs['weather']))
 
 def weather(endpoint, retries=2):
+    # already made this request? don't make it again!
+    # TODO maybe add a time limit for cache validity
+    if endpoint in cache:
+        return cache[endpoint]
+
     url = api_url(endpoint)
 
     # request and retry up to `retries` times
@@ -28,7 +36,9 @@ def weather(endpoint, retries=2):
             # wait a second --- don't hammer the api
             sleep(1)
 
-    return r.json()
+    ret = r.json()
+    cache[endpoint] = ret
+    return ret
 
 def graph():
     forecast = weather('hourly')
@@ -108,16 +118,64 @@ def graph():
 
     return '\n'.join(graph)
 
-def forecast():
+def day_forecast(day=0, prefix=''):
     forecast = weather('forecast')['forecast']
-    day_data = forecast['simpleforecast']['forecastday'][0]
-    txt_data = forecast['txt_forecast']['forecastday'][0]
-    high     = int(day_data['high']['fahrenheit'])
-    low      = int(day_data['low']['fahrenheit'])
+    day_data = forecast['simpleforecast']['forecastday'][day]
+    txt_data = forecast['txt_forecast']['forecastday'][day]
+    high     = int(day_data['high'][prefs.prefs['weather']['temp']])
+    low      = int(day_data['low'][prefs.prefs['weather']['temp']])
     precip   = int(day_data['pop'])
     conds    = day_data['conditions'].lower()
     summary  = txt_data['fcttext']
-    return f'{low}-{high}°F, {precip}% chance of precip.\n{conds}'
+    return prefs.prefs['weather']['forecast_format'].format(**locals())
+
+def conditions(day=0):
+    return (weather('forecast')
+        ['forecast']
+        ['simpleforecast']
+        ['forecastday']
+        [day]
+        ['conditions'].lower())
+
+def tomorrow_conditions():
+    return conditions(day=1)
+
+def today_forecast():
+    return day_forecast(day=0, prefix=prefs.prefs['weather']['today_prefix'])
+
+def tomorrow_forecast():
+    return day_forecast(day=1, prefix=prefs.prefs['weather']['tomorrow_prefix'])
+
+def sunrise():
+    times = weather('astronomy')['sun_phase']['sunrise']
+    return datetime.datetime.strptime(
+        times['hour'] + times['minute'],
+        '%H%M')
+    return time
+
+def sunset():
+    times = weather('astronomy')['sun_phase']['sunset']
+    return datetime.datetime.strptime(
+        times['hour'] + times['minute'],
+        '%H%M')
+
+def suntimes():
+    risetime, settime = sunrise(), sunset()
+    daylight = settime - risetime
+    return misc.align(
+        misc.hourminute(risetime) + ' rise',
+        misc.formatdelta(daylight),
+        misc.hourminute(settime) + ' set',
+        prefs.prefs['width'])
+
+def moon():
+    times = weather('astronomy')['moon_phase']
+    graphic = (prefs.prefs['weather']['moon_bright']
+        if int(times['percentIlluminated']) > 50
+        else prefs.prefs['weather']['moon_dark'])
+
+    return misc.center(
+        '{phaseofMoon} @ {percentIlluminated}%'.format(**times).lower())
 
 def main():
     forecast()

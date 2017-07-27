@@ -32,16 +32,21 @@ def report(args=None):
     # by passing functions we don't evaluate unless included in
     # prefs['format'] --- no weather api calls if you don't want weather, etc.
     replacements = {
-        ('hrule',          misc.hrule),
-        ('today',          dates.today_date),
-        ('iso_date',       dates.iso_date),
-        ('short_forecast', weather.forecast),
-        ('weather_graph',  weather.graph),
-        ('calendar',       dates.events),
-        ('countdown',      dates.today_countdowns),
-        ('todo',           dates.today_todos),
-        ('twitter',        twtr.last),
-        ('maze',           maze.from_prefs),
+        ('hrule',            misc.hrule),
+        ('today',            dates.today_date),
+        ('iso_date',         dates.iso_date),
+        ('forecast',         weather.today_forecast),
+        ('tmrw_forecast',    weather.tomorrow_forecast),
+        ('conditions',       weather.conditions),
+        ('tmrw_conditions',  weather.tomorrow_conditions),
+        ('weather_graph',    weather.graph),
+        ('calendar',         dates.events),
+        ('countdown',        dates.today_countdowns),
+        ('todo',             dates.today_todos),
+        ('twitter',          twtr.last),
+        ('maze',             maze.from_prefs),
+        ('moon',             weather.moon),
+        ('sun',              weather.suntimes),
     }
 
     # not implemented:

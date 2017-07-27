@@ -4,7 +4,12 @@
 		"{today}",
 		"{iso_date}",
 		"{hrule}",
-		"{short_forecast}",
+		"{forecast}",
+		"{conditions}",
+		"{sun}",
+		"{moon}",
+		"{tmrw_short_forecast}",
+		"{tmrw_conditions}",
 		"{hrule}",
 		"{weather_graph}",
 		"{hrule}",
@@ -17,10 +22,6 @@
 		"{maze}",
 		"\n\n\n"
 	],
-	"location": {
-		"state": "va",
-		"city": "reston"
-	},
 	"google_key_path": "google_keys.json",
 	"google_credential_path": "google_credentials.json",
 	"app_name": "the daily report",
@@ -31,12 +32,20 @@
 	"vert": "║",
 	"vert_light": "│",
 	"weather": {
+		"location": "va/reston",
 		"height": 6,
 		"chars": {
 			"precip": "·",
 			"temp":   "×",
 			"both":   "¤"
-		}
+		},
+		"max_retries": 3,
+		"today_prefix": "",
+		"tomorrow_prefix": "tomorrow: ",
+		"moon_bright": "●",
+		"moon_dark": "○",
+		"forecast_format": "{prefix}{low}-{high}°F, {precip}%op\n{conds}",
+		"temp": "fahrenheit"
 	},
 	"calendar": {
 		"scope": "https://www.googleapis.com/auth/calendar.readonly",
