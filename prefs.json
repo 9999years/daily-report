@@ -36,8 +36,8 @@
 		"max_retries": 3,
 		"today_prefix": "",
 		"tomorrow_prefix": "tomorrow: ",
-		"moon_bright": "●",
-		"moon_dark": "○",
+		"moon_bright": "○",
+		"moon_dark": "●",
 		"forecast_format": "{prefix}{low}-{high}°F, {precip}%p",
 		"temp": "fahrenheit"
 	},
