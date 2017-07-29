@@ -60,10 +60,13 @@ You will need *at least*:
 * `google-api-python-client`
 * `python-twitter`
 * `requests`
+* [`uni2esky`][uni2esky], my own library for converting Unicode strings to Esky
+  POS-58 escape sequences. Only necessary if you’d like to print on a receipt
+  printer.
 
 Which you can install with
 
-    pip install google-api-python-client python-twitter requests
+    pip install google-api-python-client python-twitter requests uni2esky
 
 A larger barrier to entry will be the API keys:
 
@@ -116,3 +119,4 @@ to do a few things.
 [gcal]: https://console.cloud.google.com/apis/dashboard
 [creds]: https://console.cloud.google.com/apis/credentials
 [proj]: https://console.cloud.google.com/projectcreate
+[uni2esky]: https://pypi.python.org/pypi/uni2esky

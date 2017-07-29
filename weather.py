@@ -6,7 +6,7 @@ from collections import namedtuple
 import os
 from time import sleep
 
-import prefs
+from prefdicts import prefs, keys
 import misc
 
 # dict of runtime caches, to avoid double requests
@@ -14,10 +14,10 @@ cache = {}
 
 def api_url(endpoint):
     return ('https://api.wunderground.com/api/'
-        + prefs.keys['wunderground']
+        + keys['wunderground']
         + '/'
         + endpoint
-        + '/q/{location}.json'.format_map(prefs.prefs['weather']))
+        + '/q/{location}.json'.format_map(prefs['weather']))
 
 def weather(endpoint, retries=2):
     # already made this request? don't make it again!
@@ -75,35 +75,50 @@ def graph():
         elif align is 'right':
             field[y] = field[y][0:x - len(val)] + val + field[y][x:]
 
-    width = prefs.prefs['width']
-    height = prefs.prefs['weather']['height']
+    width = prefs['width']
+    height = prefs['weather']['height']
     margin = 3
     step = int((width - 2 * margin) / len(moments))
-    time_rows = 3 * step
+    time_rows = 1
+    # time_rows = 3 * step
 
     graph = [' ' * width for x in range(height + time_rows)]
 
+    place('°F', 0, height)
+    place('%p', width - margin + 1, height)
+
     for y in range(height):
+        # temp axis marker
         place(str(int(misc.lerp(temp_min, temp_max, y / (height - 1)))),
             0, y)
 
-        place(prefs.prefs['vert'], margin - 1, y)
+        # left rule
+        place(prefs['vert'], margin - 1, y)
 
+        # precip marker
         place(str(int(misc.lerp(precip_min, precip_max, y / (height - 1)))),
             width, y, align='right')
 
-        place(prefs.prefs['vert'], width - margin, y)
+        # right rule
+        place(prefs['vert'], width - margin, y)
 
-    chars = prefs.prefs['weather']['chars']
+    chars = prefs['weather']['chars']
 
     for i, moment in enumerate(moments):
-        odd = i % time_rows
+        # odd = i % time_rows
         i_orig = i
         i = int(i * step + margin)
-        time_num = moment.time[:-2]
-        if int(time_num) % 12 == 0:
-            for j in range(height):
-                place(prefs.prefs['vert_light'], i, j)
+        time_num = int(moment.time[:-2])
+
+        if time_num % 3 == 0:
+            # write time at 3 6 9 12
+            place(str(time_num), i, height)
+
+            # vrule at 12am/pm
+            if time_num % 12 == 0:
+                for j in range(height):
+                    place(prefs['vert_light'], i, j)
+
         temp_y = int(misc.scale(
             moment.temp, temp_min, temp_max, 0, height - 1))
         place(chars['temp'], i, temp_y)
@@ -114,7 +129,6 @@ def graph():
         else:
             place(chars['precip'], i, precip_y)
 
-        place(time_num, i, height + odd)
 
     return '\n'.join(graph)
 
@@ -122,15 +136,15 @@ def day_forecast(day=0, prefix=''):
     forecast = weather('forecast')['forecast']
     day_data = forecast['simpleforecast']['forecastday'][day]
     txt_data = forecast['txt_forecast']['forecastday'][day]
-    high     = int(day_data['high'][prefs.prefs['weather']['temp']])
-    low      = int(day_data['low'][prefs.prefs['weather']['temp']])
+    high     = int(day_data['high'][prefs['weather']['temp']])
+    low      = int(day_data['low'][prefs['weather']['temp']])
     precip   = int(day_data['pop'])
     conds    = day_data['conditions'].lower()
     summary  = txt_data['fcttext']
-    return prefs.prefs['weather']['forecast_format'].format(**locals())
+    return prefs['weather']['forecast_format'].format(**locals())
 
 def conditions(day=0):
-    return (weather('forecast')
+    return misc.center(weather('forecast')
         ['forecast']
         ['simpleforecast']
         ['forecastday']
@@ -141,40 +155,40 @@ def tomorrow_conditions():
     return conditions(day=1)
 
 def today_forecast():
-    return day_forecast(day=0, prefix=prefs.prefs['weather']['today_prefix'])
+    return day_forecast(day=0, prefix=prefs['weather']['today_prefix'])
 
 def tomorrow_forecast():
-    return day_forecast(day=1, prefix=prefs.prefs['weather']['tomorrow_prefix'])
+    return day_forecast(day=1, prefix=prefs['weather']['tomorrow_prefix'])
+
+def parsesuntime(t):
+    return datetime.datetime.strptime(
+        misc.left_pad(t['hour'], 2, '0') + t['minute'],
+        '%H%M')
 
 def sunrise():
     times = weather('astronomy')['sun_phase']['sunrise']
-    return datetime.datetime.strptime(
-        times['hour'] + times['minute'],
-        '%H%M')
-    return time
+    return parsesuntime(times)
 
 def sunset():
     times = weather('astronomy')['sun_phase']['sunset']
-    return datetime.datetime.strptime(
-        times['hour'] + times['minute'],
-        '%H%M')
+    return parsesuntime(times)
 
 def suntimes():
     risetime, settime = sunrise(), sunset()
     daylight = settime - risetime
     return misc.align(
-        misc.hourminute(risetime) + ' rise',
-        misc.formatdelta(daylight, clock=24),
-        misc.hourminute(settime) + ' set',
-        prefs.prefs['width'])
+        misc.hoursminutes(risetime, pad  = '') + ' ↑',
+        misc.formatdelta(daylight, clock = 24) + ' dl',
+        misc.hoursminutes(settime, pad   = '') + ' ↓',
+        prefs['width'])
 
 def moon():
     times = weather('astronomy')['moon_phase']
     phase = times['phaseofMoon']
     percent = times['percentIlluminated']
-    graphic = (prefs.prefs['weather']['moon_bright']
+    graphic = (prefs['weather']['moon_bright']
         if int(times['percentIlluminated']) > 50
-        else prefs.prefs['weather']['moon_dark'])
+        else prefs['weather']['moon_dark'])
 
     return misc.center(f'{graphic} {phase.lower()} @ {percent}%')
 

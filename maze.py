@@ -5,7 +5,7 @@
 # http://www.vidarholen.net/~vidar/generatemaze.py
 
 import random
-import prefs
+from prefdicts import prefs, keys
 
 # so we can deal with directions with binary addition / subtraction
 # north and south = north + south or north | south yknow that kinda deal
@@ -34,16 +34,16 @@ def maze_char(directions):
         ['┤', '┤'], # u | l | d
         ['┼', '┼'], # u | l | d | r
     ]
-    if prefs.prefs['maze']['style'] == 'round':
+    if prefs['maze']['style'] == 'round':
         chars = [k[0] for k in chars]
-    elif prefs.prefs['maze']['style'] == 'square':
+    elif prefs['maze']['style'] == 'square':
         chars = [k[1] for k in chars]
-    elif prefs.prefs['maze']['style'] == 'random':
+    elif prefs['maze']['style'] == 'random':
         chars = [k[random.randint(0, 1)] for k in chars]
     else:
         chars = [chr(random.randint(0x2500, 0x27ff)) for k in chars]
 
-    if prefs.prefs['maze']['halves'] == False:
+    if prefs['maze']['halves'] == False:
         chars[north] = chars[south] = '│'
         chars[east] = chars[west] = '─'
 
@@ -158,15 +158,15 @@ def gen(w, h):
                 ret += maze_char(east | west)
         ret += '\n'
 
-    if 'start' in prefs.prefs['maze']:
-        ret = prefs.prefs['maze']['start'] + ret[1:]
-    if 'end' in prefs.prefs['maze']:
-        ret = ret[:-3] + prefs.prefs['maze']['end'] + '\n'
+    if 'start' in prefs['maze']:
+        ret = prefs['maze']['start'] + ret[1:]
+    if 'end' in prefs['maze']:
+        ret = ret[:-3] + prefs['maze']['end'] + '\n'
 
     return ret
 
 def from_prefs():
-    return gen(prefs.prefs['width'], prefs.prefs['maze']['height'])
+    return gen(prefs['width'], prefs['maze']['height'])
 
 def main():
     import argparse

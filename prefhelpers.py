@@ -1,14 +1,16 @@
 import json
 from os import path
 
+import prefdicts
+
+global prefs_dir
+global prefs
+global keys
+
 def json_from_file(fname, encoding='utf-8'):
     with open(fname, encoding=encoding) as f:
         return json.loads(f.read())
     return None
-
-global prefs
-global keys
-global prefs_dir
 
 def fname(*route):
     """
@@ -28,8 +30,8 @@ def fname(*route):
 
 def get_prefs(pref_path=None, encoding='utf-8'):
     global prefs
-    global prefs_dir
     global keys
+    global prefs_dir
     # get script directory
     here = path.abspath(path.dirname(__file__))
     if pref_path is None:
@@ -52,7 +54,3 @@ def get_prefs(pref_path=None, encoding='utf-8'):
     prefs = json_from_file(pref_path, encoding=encoding)
     keys  = json_from_file(fname('api_keys'), encoding=encoding)
     return prefs, keys
-
-load_prefs = get_prefs
-
-get_prefs()

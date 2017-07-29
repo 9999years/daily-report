@@ -6,7 +6,8 @@ import uni2esky
 
 # local imports
 import gen_credentials as creds
-import prefs
+from prefdicts import prefs, keys
+import prefhelpers
 import weather
 import dates
 import misc
@@ -14,9 +15,9 @@ import twtr
 import maze
 
 def report(args=None):
-    prefs.get_prefs()
+    prefs, keys = prefhelpers.get_prefs()
 
-    msg = '\n'.join(prefs.prefs['format'])
+    msg = '\n'.join(prefs['format'])
 
     def replace(txt, replacement):
         nonlocal msg
@@ -47,6 +48,7 @@ def report(args=None):
         ('twitter',          twtr.last),
         ('maze',             maze.from_prefs),
         ('moon',             weather.moon),
+        ('work',             dates.today_work),
         ('sun',              weather.suntimes),
     }
 

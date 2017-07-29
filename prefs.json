@@ -10,10 +10,10 @@
 		"{tmrw_forecast}",
 		"{tmrw_conditions}", "{hrule}",
 		"{weather_graph}", "{hrule}",
+		"{work}", "{thinhrule}",
 		"{todo}", "{thinhrule}",
 		"{calendar}", "{thinhrule}",
-		"{countdown}", "{hrule}",
-		"{maze}",
+		"{countdown}",
 		"\n\n\n"
 	],
 	"google_key_path": "google_keys.json",
@@ -45,6 +45,7 @@
 		"scope": "https://www.googleapis.com/auth/calendar.readonly",
 		"todo_pat": "to.?do",
 		"countdown_pat": "count.?downs?",
+		"work_pat": ".*work.*",
 		"todo_check": "[] ",
 		"max_countdowns": 10
 	},

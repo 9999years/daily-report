@@ -4,7 +4,7 @@ import dates
 import textwrap
 
 # local
-import prefs
+from prefdicts import prefs, keys
 
 def get_api():
     return twitter.Api(
@@ -26,7 +26,7 @@ def get_date(tweet):
 def format(tweet):
     date = get_date(tweet)
     return (textwrap.fill(f'@{tweet.user.screen_name}: {tweet.text}',
-            width=prefs.prefs['width'])
+            width=prefs['width'])
         + f'\n{tweet.favorite_count} likes, {tweet.retweet_count} rts\n'
         + datetime.datetime.strftime(date, '%Y-%m-%d %I:%M:%S %p'))
 

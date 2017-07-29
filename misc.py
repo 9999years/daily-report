@@ -1,16 +1,19 @@
-import prefs
 import textwrap
+import datetime
 
-def left_pad(txt, width=prefs.prefs['width'], char=' '):
+# local
+from prefdicts import prefs, keys
+
+def left_pad(txt, width=prefs['width'], char=' '):
     while len(txt) < width:
         txt = char + txt
     return txt
 
 def hrule():
-    return prefs.prefs['horiz'] * prefs.prefs['width']
+    return prefs['horiz'] * prefs['width']
 
 def thinhrule():
-    return prefs.prefs['horiz_light'] * prefs.prefs['width']
+    return prefs['horiz_light'] * prefs['width']
 
 def lerp(min, max, amt):
     """Interpolate from min to max by amt"""
@@ -29,14 +32,14 @@ def format_left(txt, leader='',
     firstline = firstline or leader
     margin = len(firstline)
     leader = left_pad(leader, margin) if align_leader == 'right' else leader
-    width = prefs.prefs['width'] - margin
+    width = prefs['width'] - margin
     lines = textwrap.wrap(txt, width=width)
     out = f'{firstline}{lines.pop(0)}\n'
     for line in lines:
         out += (f'{leader}{line}\n')
     return out
 
-def center(txt, width=prefs.prefs['width'], char=' '):
+def center(txt, width=prefs['width'], char=' '):
     spc = (width - len(txt)) / 2
     if isinstance(spc, int):
         return char * spc + txt + char * spc
@@ -45,7 +48,7 @@ def center(txt, width=prefs.prefs['width'], char=' '):
         spc = int(spc)
         return char * spc + txt + char * (spc + 1)
 
-def align(left='', center='', right='', width=prefs.prefs['width']):
+def align(left='', center='', right='', width=prefs['width']):
     """
     returns a string aligned to `width`, with `left`, `right`, and `center` at
     their respective locations in the string. `center` will destructively
@@ -53,25 +56,36 @@ def align(left='', center='', right='', width=prefs.prefs['width']):
 
     like a stronger left_pad
     """
-    r = left_pad(right, width)
-    lr = left + r[len(left):]
-    c = width // 2
-    halfc = len(center) // 2
-    return lr[:c - halfc] + center + lr[c + halfc:]
+    lr = left + left_pad(right, width)[len(left):]
 
-def hourminute(time):
-    return time.strftime('%I:%M%p')
+    c = width // 2
+    halfc = len(center) / 2
+    if isinstance(halfc, float):
+        halfcr = int(halfc)
+        halfcl = halfcr + 1
+    else:
+        halfcl = halfcr = halfc
+
+    return lr[:c - halfcl] + center + lr[c + halfcr:]
+
+def hoursminutes(time, pad=' '):
+    hrs = datetime.datetime.strftime(time, '%I')
+    # pad with spaces instead of 0s
+    if hrs[0] == '0':
+        hrs = pad + hrs[1:]
+    return hrs + ':' + datetime.datetime.strftime(time, '%M%p')
 
 def formatdelta(time, clock=12):
     days = time.days
     hrs  = time.seconds // 3600 # 60 × 60
-    ampm = ''
     if clock == 12:
         if hrs > 12:
             hrs -= 12
             ampm = 'PM'
         else:
             ampm = 'AM'
+    else:
+        ampm = ''
 
     secs = time.seconds  % 3600
     mins = secs // 60
@@ -81,6 +95,6 @@ def formatdelta(time, clock=12):
         ret += f'{days} days, '
     ret += f'{hrs: 2}:{mins:02}'
     if secs != 0:
-        ret += f':{secs:02}'
+        ret += f'::{secs:02}'
     ret += ampm
     return ret

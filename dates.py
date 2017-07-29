@@ -1,5 +1,5 @@
 import datetime
-import prefs
+from prefdicts import prefs, keys
 from collections import namedtuple
 # google calendar
 import httplib2
@@ -41,16 +41,14 @@ def today_times():
 
     return today, tomorrow
 
-def today_events():
+def today_events(calendar='primary', orderBy='startTime', **kwargs):
     credentials, http, service = creds.build_creds()
     today, tomorrow = today_times()
 
     eventsResult = service.events().list(
-        calendarId='primary', singleEvents=True, orderBy='startTime',
-        timeMin=today.isoformat(), timeMax=tomorrow.isoformat()).execute()
-    events = eventsResult.get('items', [])
-
-    return events
+        calendarId=calendar, singleEvents=True, orderBy=orderBy,
+        **kwargs, timeMin=today.isoformat(), timeMax=tomorrow.isoformat()).execute()
+    return eventsResult.get('items', [])
 
 def list_calendars():
     credentials, http, service = creds.build_creds()
@@ -101,31 +99,30 @@ def event_times(event):
     event['duration'] = event['end'] - event['start']
     return event
 
-def hours(time):
-    hours = datetime.datetime.strftime(time, '%I')
-    # pad with spaces instead of 0s
-    i = 0
-    while hours[i] is '0' and i < len(hours):
-        hours = hours[:i] + ' ' + hours[i + 1:]
-    return hours + ':' + datetime.datetime.strftime(time, '%M%p')
+def format_event(time, event):
+    leader = ' ' + prefs['vert'] + ' '
+    if time == 'all day' and event['duration'].days > 1:
+        event['summary'] += (' (day '
+            + str((today - event['start']).days) + ' of '
+            + str((event['end'] - event['start']).days) + ')')
+
+    return misc.format_left(event['summary'],
+        leader=leader, firstline=time + leader)
+
 
 def today_todos():
-    credentials, http, service = creds.build_creds()
-    today, tomorrow = today_times()
-    todo_cals = calendar_match(prefs.prefs['calendar']['todo_pat'])
+    todo_cals = calendar_match(prefs['calendar']['todo_pat'])
     ret = ''
+
     def add_todo(event):
         nonlocal ret
         ret += misc.format_left(event['summary'],
-            firstline=prefs.prefs['calendar']['todo_check'])
+            firstline=prefs['calendar']['todo_check'])
         pass
 
     todos = []
     for cal in todo_cals:
-        eventsResult = service.events().list(
-            calendarId=cal['id'], singleEvents=True, orderBy='updated',
-            timeMin=today.isoformat(), timeMax=tomorrow.isoformat()).execute()
-        todos.extend(eventsResult.get('items', []))
+        todos.extend(today_events(cal['id'], orderBy='updated'))
 
     for todo in todos:
         add_todo(todo)
@@ -133,9 +130,8 @@ def today_todos():
     return ret.rstrip()
 
 def today_countdowns():
-    credentials, http, service = creds.build_creds()
     today, tomorrow = today_times()
-    countdown_cals = calendar_match(prefs.prefs['calendar']['countdown_pat'])
+    countdown_cals = calendar_match(prefs['calendar']['countdown_pat'])
     ret = ''
 
     def days_until(event):
@@ -144,18 +140,16 @@ def today_countdowns():
     def add_countdown(event):
         nonlocal ret
         event['summary'] += event['start'].strftime(' (%Y-%m-%d)')
-        leader = ' ' + prefs.prefs['vert'] + ' '
+        leader = ' ' + prefs['vert'] + ' '
         ret += misc.format_left(event['summary'],
             leader=leader,
             firstline=misc.left_pad(days_until(event), left_width) + leader)
 
     countdowns = []
     for cal in countdown_cals:
-        eventsResult = service.events().list(
-            calendarId=cal['id'], singleEvents=True, orderBy='updated',
-            timeMin=today.isoformat(),
-            maxResults=prefs.prefs['calendar']['max_countdowns']).execute()
-        events = eventsResult.get('items', [])
+        events = (today_events(
+            calendar=cal['id'], orderBy='updated',
+            maxResults=prefs['calendar']['max_countdowns']))
         for event in events:
             countdowns.append(event_times(event))
 
@@ -171,6 +165,20 @@ def today_countdowns():
 
     return ret.rstrip()
 
+def today_work():
+    work_cals = calendar_match(prefs['calendar']['work_pat'])
+
+    shifts = []
+    for cal in work_cals:
+        shifts.extend(today_events(cal['id']))
+
+    out = ''
+    for shift in shifts:
+        shift = event_times(shift)
+        out += format_event(misc.hoursminutes(shift['start']), shift)
+
+    return out.rstrip()
+
 def events():
     today, tomorrow = today_times()
 
@@ -185,24 +193,13 @@ def events():
             todays.append(event)
 
     out = ''
-    def format_event(time, event):
-        nonlocal out
-        leader = ' ' + prefs.prefs['vert'] + ' '
-        if time == 'all day' and event['duration'].days > 1:
-            event['summary'] += (' (day '
-                + str((today - event['start']).days) + ' of '
-                + str((event['end'] - event['start']).days) + ')')
-
-        out += misc.format_left(event['summary'],
-            leader=leader, firstline=time + leader)
-
     for event in alldays:
-        format_event('all day', event)
+        out += format_event('all day', event)
 
     out += misc.thinhrule() + '\n'
 
     for event in todays:
-        format_event(hours(event['start']), event)
+        out += format_event(misc.hoursminutes(event['start']), event)
 
     return out.rstrip()
 
@@ -210,5 +207,6 @@ def today_date():
     return 'today is ' + today_times()[0].strftime('%A, %B %d').lower()
 
 def iso_date():
-    return misc.left_pad(
-        today_times()[0].strftime('%Y-%m-%d'), prefs.prefs['width'])
+    return misc.align(
+        left=misc.hoursminutes(datetime.datetime.now(), pad=''),
+        right=today_times()[0].strftime('%Y-%m-%d'))
