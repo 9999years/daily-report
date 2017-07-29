@@ -177,20 +177,20 @@ def suntimes():
     risetime, settime = sunrise(), sunset()
     daylight = settime - risetime
     return misc.align(
-        misc.hoursminutes(risetime, pad  = '') + ' ↑',
-        misc.formatdelta(daylight, clock = 24) + ' dl',
-        misc.hoursminutes(settime, pad   = '') + ' ↓',
+        misc.hoursminutes(risetime, pad='') + prefs['weather']['sunrise_suffix'],
+        misc.formatdelta(daylight, clock= 24) + prefs['weather']['daylight_suffix'],
+        misc.hoursminutes(settime, pad='') + prefs['weather']['sunset_suffix'],
         prefs['width'])
 
 def moon():
     times = weather('astronomy')['moon_phase']
-    phase = times['phaseofMoon']
+    phase = times['phaseofMoon'].lower()
     percent = times['percentIlluminated']
-    graphic = (prefs['weather']['moon_bright']
+    graphic = (prefs['weather']['moon']['bright_graphic']
         if int(times['percentIlluminated']) > 50
-        else prefs['weather']['moon_dark'])
+        else prefs['weather']['moon']['dark_graphic'])
 
-    return misc.center(f'{graphic} {phase.lower()} @ {percent}%')
+    return misc.center(prefs['weather']['moon']['format'].format(**locals()))
 
 def main():
     forecast()
