@@ -152,7 +152,7 @@ def today_countdowns():
         leader = ' ' + prefs['vert'] + ' '
         ret += misc.format_left(event['summary'],
             leader=leader,
-            firstline=misc.left_pad(days_until(event), left_width) + leader)
+            firstline=days_until(event).rjust(left_width) + leader)
 
     countdowns = []
     for cal in countdown_cals:
@@ -215,7 +215,8 @@ def events():
 def today_date():
     return 'today is ' + today_times()[0].strftime('%A, %B %d').lower()
 
+def now_hm():
+    return misc.hoursminutes(datetime.datetime.now(), pad='')
+
 def iso_date():
-    return misc.align(
-        left=misc.hoursminutes(datetime.datetime.now(), pad=''),
-        right=today_times()[0].strftime('%Y-%m-%d'))
+    return today_times()[0].strftime('%Y-%m-%d')

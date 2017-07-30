@@ -132,7 +132,7 @@ def graph():
 
     return '\n'.join(graph)
 
-def day_forecast(day=0, prefix=''):
+def day_forecast(day=0):
     forecast = weather('forecast')['forecast']
     day_data = forecast['simpleforecast']['forecastday'][day]
     txt_data = forecast['txt_forecast']['forecastday'][day]
@@ -141,10 +141,10 @@ def day_forecast(day=0, prefix=''):
     precip   = int(day_data['pop'])
     conds    = day_data['conditions'].lower()
     summary  = txt_data['fcttext']
-    return prefs['weather']['forecast_format'].format(**locals())
+    return misc.format(prefs['weather']['forecast_format'], locals())
 
 def conditions(day=0):
-    return misc.center(weather('forecast')
+    return (weather('forecast')
         ['forecast']
         ['simpleforecast']
         ['forecastday']
@@ -155,15 +155,14 @@ def tomorrow_conditions():
     return conditions(day=1)
 
 def today_forecast():
-    return day_forecast(day=0, prefix=prefs['weather']['today_prefix'])
+    return day_forecast(day=0)
 
 def tomorrow_forecast():
-    return day_forecast(day=1, prefix=prefs['weather']['tomorrow_prefix'])
+    return day_forecast(day=1)
 
 def parsesuntime(t):
     return datetime.datetime.strptime(
-        misc.left_pad(t['hour'], 2, '0') + t['minute'],
-        '%H%M')
+        t['hour'].rjust(2, '0') + t['minute'], '%H%M')
 
 def sunrise():
     times = weather('astronomy')['sun_phase']['sunrise']
@@ -176,11 +175,24 @@ def sunset():
 def suntimes():
     risetime, settime = sunrise(), sunset()
     daylight = settime - risetime
-    return misc.align(
-        misc.hoursminutes(risetime, pad='') + prefs['weather']['sunrise_suffix'],
-        misc.formatdelta(daylight, clock= 24) + prefs['weather']['daylight_suffix'],
-        misc.hoursminutes(settime, pad='') + prefs['weather']['sunset_suffix'],
-        prefs['width'])
+
+    risefmt = misc.format(
+        prefs['weather']['sunrise_format'],
+        { 'sunrise': misc.hoursminutes(risetime, pad='') })
+
+    setfmt = misc.format(
+        prefs['weather']['sunset_format'],
+        { 'sunset': misc.hoursminutes(settime, pad='') })
+
+    dayfmt = misc.format(
+        prefs['weather']['daylight_format'],
+        { 'daylight': misc.formatdelta(daylight, clock=24) })
+
+    return misc.format(
+        prefs['weather']['sun_format'],
+        {   'sunrise': risefmt,
+            'sunset': setfmt,
+            'daylight': dayfmt })
 
 def moon():
     times = weather('astronomy')['moon_phase']
@@ -190,7 +202,7 @@ def moon():
         if int(times['percentIlluminated']) > 50
         else prefs['weather']['moon']['dark_graphic'])
 
-    return misc.center(prefs['weather']['moon']['format'].format(**locals()))
+    return prefs['weather']['moon']['format'].format(**locals())
 
 def main():
     forecast()

@@ -1,20 +1,20 @@
 {
 	"format": [
 		"good morning!",
-		"{today}",
-		"{iso_date}", "{hrule}",
-		"{forecast}",
-		"{conditions}",
-		"{sun}",
-		"{moon}", "{thinhrule}",
-		"{tmrw_forecast}",
-		"{tmrw_conditions}", "{hrule}",
-		"{weather_graph}", "{hrule}",
-		"{work}", "{thinhrule}",
-		"{todo}", "{thinhrule}",
-		"{calendar}", "{thinhrule}",
-		"{countdown}",
-		"\n\n\n"
+		"{today()}",
+		"{iso_date()}", "{hrule()}",
+		"{forecast()!c}",
+		"{conditions()!c}",
+		"{sun()}",
+		"{moon()!c}", "{thinhrule()}",
+		"tomorrow: {tmrw_forecast()}",
+		"{tmrw_conditions()!c}", "{hrule()}",
+		"{weather_graph()}", "{hrule()}",
+		"{work()}", "{thinhrule()}",
+		"{todo()}", "{thinhrule()}",
+		"{calendar()}", "{thinhrule()}",
+		"{countdown()}",
+		"\n\n\n\n"
 	],
 	"google_key_path": "google_keys.json",
 	"google_credential_path": "google_credentials.json",
@@ -34,17 +34,16 @@
 			"both":   "¤"
 		},
 		"max_retries": 3,
-		"today_prefix": "",
-		"tomorrow_prefix": "tomorrow: ",
+		"forecast_format": "{low}-{high}°F, {precip}%p",
 		"moon": {
 			"bright_graphic": "○",
 			"dark_graphic": "●",
 			"format": "{graphic} {phase} @ {percent}%"
 		},
-		"sunrise_suffix": " ↑",
-		"sunset_suffix": " ↓",
-		"daylight_suffix": "",
-		"forecast_format": "{prefix}{low}-{high}°F, {precip}%p",
+		"sunrise_format": "{sunrise} ↑",
+		"sunset_format": "{sunset} ↓",
+		"daylight_format": "{daylight}",
+		"sun_format": "{align(sunrise, daylight, sunset)}",
 		"temp": "fahrenheit"
 	},
 	"calendar": {

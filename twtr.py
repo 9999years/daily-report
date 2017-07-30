@@ -19,7 +19,8 @@ def get_tweets(user='dril'):
     return api.GetUserTimeline(screen_name=user)
 
 def get_date(tweet):
-    # Tue Jul 18 03:44:48 +0000 2017
+    """Tue Jul 18 03:44:48 +0000 2017
+    """
     return datetime.datetime.strptime(tweet.created_at,
         '%a %b %d %H:%M:%S %z %Y')
 

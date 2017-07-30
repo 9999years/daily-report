@@ -8,72 +8,12 @@ import uni2esky
 import gen_credentials as creds
 from prefdicts import prefs, keys
 import prefhelpers
-import weather
-import dates
 import misc
-import twtr
-import maze
 
-def report(args=None):
+def report():
     prefs, keys = prefhelpers.get_prefs()
+    return misc.format(prefs['format'])
 
-    msg = '\n'.join(prefs['format'])
-
-    def replace(txt, replacement):
-        nonlocal msg
-        txt = '{' + txt + '}'
-        if txt in msg:
-            if callable(replacement):
-                # function for lazy eval.
-                msg = msg.replace(txt, replacement())
-            else:
-                # string
-                msg = msg.replace(txt, replacement)
-
-    # by passing functions we don't evaluate unless included in
-    # prefs['format'] --- no weather api calls if you don't want weather, etc.
-    replacements = {
-        ('hrule',            misc.hrule),
-        ('thinhrule',        misc.thinhrule),
-        ('today',            dates.today_date),
-        ('iso_date',         dates.iso_date),
-        ('forecast',         weather.today_forecast),
-        ('tmrw_forecast',    weather.tomorrow_forecast),
-        ('conditions',       weather.conditions),
-        ('tmrw_conditions',  weather.tomorrow_conditions),
-        ('weather_graph',    weather.graph),
-        ('calendar',         dates.events),
-        ('countdown',        dates.today_countdowns),
-        ('todo',             dates.today_todos),
-        ('twitter',          twtr.last),
-        ('maze',             maze.from_prefs),
-        ('moon',             weather.moon),
-        ('work',             dates.today_work),
-        ('sun',              weather.suntimes),
-    }
-
-    # not implemented:
-    # valid:
-    # {xxx:(...)}
-    #    or
-    # {xxx}
-    # literal:
-    # {{xxx}}
-
-    for replacement, fn in replacements:
-        replace(replacement, fn)
-
-    # empty sections surrounded by hrules can look silly
-    # make them one hrule instead
-    # replace multiple thin hrules with one thinhrule
-    msg = re.sub('((' + misc.thinhrule() + r')\n*){2,}',
-        misc.thinhrule() + '\n', msg)
-    # but all regular hrules or mixed thin/regular hrules turn into regular
-    # hrules
-    msg = re.sub('((' + misc.hrule() + '|' + misc.thinhrule() + r')\n*){2,}',
-        misc.hrule() + '\n', msg)
-
-    return msg
 
 def main():
     parser = argparse.ArgumentParser(

@@ -25,8 +25,6 @@ Usage:
     77|      ··××××  ×··         | 3
     73|            ××   ·········| 0
        6  9  12 3  6  9  12 3  6
-        7  10 1  4  7  10 1  4  7
-         8  11 2  5  8  11 2  5
     --------------------------------
     all day | parents gone (day 13
             | of 16)
@@ -43,12 +41,39 @@ Usage:
     285 | birthday (2018-04-30)
 
 
-
-Make sure to edit `prefs.json` for accurate weather forecasts.
+Make sure to read/edit `prefs.json`! It controls all of the program's behavior,
+from weather location to output format.
 
 Potential usage with `cron`, to print daily at 6am:
 
     0 6 * * * cd /home/pi/daily-report && git pull && ./dailyreport.py | lpr -l
+
+# Modules
+
+The Daily Report is split into modules of loosely associated output, each of
+which implements one or more output functions, which are mapped to replacement
+names.
+
+1. `dates.py`
+
+    Date and Google Calendar handling interfaces. Depends on
+    `gen_credentials.py`.
+    1. Events
+       All-day and timed events
+            all day | parents gone (day 13
+                    | of 16)
+            --------------------------------
+             8:00PM | egg drop soup w
+                    | camille (& possibly
+                    | aya)
+            --------------------------------
+            [] send immunization records
+            --------------------------------
+             16 | visit jay (2017-08-04)
+             39 | move in day (2017-08-27)
+            159 | christmas (2017-12-25)
+            285 | birthday (2018-04-30)
+
 
 # Dependencies
 
@@ -69,6 +94,14 @@ Which you can install with
     pip install google-api-python-client python-twitter requests uni2esky
 
 A larger barrier to entry will be the API keys:
+
+# Functionality coming soon, maybe
+
+* Full parsing, rather than simple replacements; I’d like to allow arguments
+  (for things like Twitter feeds) and nested calls (for things like centering).
+  Maybe a rich local environment and a call to .format(**locals()) can make it
+  work?
+* Stock module (hook up with Yahoo Finance?)
 
 # APIs
 
