@@ -2,7 +2,7 @@
 	"format": [
 		"good morning!",
 		"{today()}",
-		"{iso_date()}", "{hrule()}",
+		"{align(now_hm(), '', iso_date())}", "{hrule()}",
 		"{forecast()!c}",
 		"{conditions()!c}",
 		"{sun()}",

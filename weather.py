@@ -84,8 +84,10 @@ def graph():
 
     graph = [' ' * width for x in range(height + time_rows)]
 
-    place('°F', 0, height)
-    place('%p', width - margin + 1, height)
+    chars = prefs['weather']['chars']
+
+    place('°F' + chars['temp'], 0, height)
+    place(chars['precip'] + '%p', width - margin, height)
 
     for y in range(height):
         # temp axis marker
@@ -101,8 +103,6 @@ def graph():
 
         # right rule
         place(prefs['vert'], width - margin, y)
-
-    chars = prefs['weather']['chars']
 
     for i, moment in enumerate(moments):
         # odd = i % time_rows
