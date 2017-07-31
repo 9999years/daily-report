@@ -105,8 +105,8 @@ Example output:
 
 Definition: `dates.today_date`
 
-Description: Today’s date, human-style. Hopefully more customizable in the
-future.
+Description: Today’s date, human-style. From `prefs.dates.today_format`, as a
+[`strftime` escape][strftime]
 
 Example output: `today is sunday, july 30`
 
@@ -144,11 +144,8 @@ A larger barrier to entry will be the API keys:
 
 # Functionality coming soon, maybe
 
-* Full parsing, rather than simple replacements; I’d like to allow arguments
-  (for things like Twitter feeds) and nested calls (for things like centering).
-  Maybe a rich local environment and a call to .format(**locals()) can make it
-  work?
 * Stock module (hook up with Yahoo Finance?)
+* ???
 
 # APIs
 
@@ -202,3 +199,4 @@ to do a few things.
 [uni2esky]: https://pypi.python.org/pypi/uni2esky
 [fmt-strings]: https://docs.python.org/3/library/string.html#format-string-syntax
 [iso8601]: https://en.m.wikipedia.org/wiki/ISO_8601
+[strftime]: https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior

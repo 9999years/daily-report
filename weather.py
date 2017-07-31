@@ -8,6 +8,7 @@ from time import sleep
 
 from prefdicts import prefs, keys
 import misc
+from reportformatter import formatter
 
 # dict of runtime caches, to avoid double requests
 cache = {}
@@ -136,12 +137,17 @@ def day_forecast(day=0):
     forecast = weather('forecast')['forecast']
     day_data = forecast['simpleforecast']['forecastday'][day]
     txt_data = forecast['txt_forecast']['forecastday'][day]
-    high     = int(day_data['high'][prefs['weather']['temp']])
-    low      = int(day_data['low'][prefs['weather']['temp']])
-    precip   = int(day_data['pop'])
-    conds    = day_data['conditions'].lower()
-    summary  = txt_data['fcttext']
-    return misc.format(prefs['weather']['forecast_format'], locals())
+
+    return formatter.format(prefs['weather']['forecast_format'],
+        forecast=forecast,
+        day_data=day_data,
+        txt_data=txt_data,
+        high    =int(day_data['high'][prefs['weather']['temp']]),
+        low     =int(day_data['low'][prefs['weather']['temp']]),
+        precip  =int(day_data['pop']),
+        conds   =day_data['conditions'],
+        summary =txt_data['fcttext'],
+    )
 
 def conditions(day=0):
     return (weather('forecast')
@@ -149,7 +155,7 @@ def conditions(day=0):
         ['simpleforecast']
         ['forecastday']
         [day]
-        ['conditions'].lower())
+        ['conditions'])
 
 def tomorrow_conditions():
     return conditions(day=1)
@@ -176,23 +182,23 @@ def suntimes():
     risetime, settime = sunrise(), sunset()
     daylight = settime - risetime
 
-    risefmt = misc.format(
-        prefs['weather']['sunrise_format'],
-        { 'sunrise': misc.hoursminutes(risetime, pad='') })
+    risefmt = formatter.format(
+        prefs['weather']['sun']['rise_format'],
+        sunrise=misc.hoursminutes(risetime, pad=''))
 
-    setfmt = misc.format(
-        prefs['weather']['sunset_format'],
-        { 'sunset': misc.hoursminutes(settime, pad='') })
+    setfmt = formatter.format(
+        prefs['weather']['sun']['set_format'],
+        sunset=misc.hoursminutes(settime, pad=''))
 
-    dayfmt = misc.format(
-        prefs['weather']['daylight_format'],
-        { 'daylight': misc.formatdelta(daylight, clock=24) })
+    dayfmt = formatter.format(
+        prefs['weather']['sun']['daylight_format'],
+        daylight=misc.formatdelta(daylight, clock=24))
 
-    return misc.format(
-        prefs['weather']['sun_format'],
-        {   'sunrise': risefmt,
-            'sunset': setfmt,
-            'daylight': dayfmt })
+    return formatter.format(
+        prefs['weather']['sun']['format'],
+        sunrise =risefmt,
+        sunset  =setfmt,
+        daylight=dayfmt,)
 
 def moon():
     times = weather('astronomy')['moon_phase']
@@ -202,7 +208,8 @@ def moon():
         if int(times['percentIlluminated']) > 50
         else prefs['weather']['moon']['dark_graphic'])
 
-    return prefs['weather']['moon']['format'].format(**locals())
+    return formatter.format(prefs['weather']['moon']['format'],
+        **locals())
 
 def main():
     forecast()

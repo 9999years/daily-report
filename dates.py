@@ -1,5 +1,4 @@
 import datetime
-from prefdicts import prefs, keys
 from collections import namedtuple
 # google calendar
 import httplib2
@@ -11,6 +10,7 @@ import textwrap
 # local
 import misc
 import gen_credentials as creds
+from prefdicts import prefs, keys
 
 def timezone():
     delt = datetime.datetime.now() - datetime.datetime.utcnow()
@@ -213,7 +213,7 @@ def events():
     return out.rstrip()
 
 def today_date():
-    return 'today is ' + today_times()[0].strftime('%A, %B %d').lower()
+    return today_times()[0].strftime(prefs['dates']['today_format'])
 
 def now_hm():
     return misc.hoursminutes(datetime.datetime.now(), pad='')
