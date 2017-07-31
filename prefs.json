@@ -1,6 +1,6 @@
 {
 	"format": [
-		"good morning!",
+		"         good morning!",
 		"{today()}",
 		"{align(now_hm(), '', iso_date())}", "{hrule()}",
 		"{forecast()!c}",

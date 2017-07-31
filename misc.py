@@ -31,13 +31,13 @@ def format(msg, extra_vars={}):
     work            =   dates.today_work
     twitter         =    twtr.last
     maze            =   _maze.from_prefs
-    moon            = weather.moon
     forecast        = weather.today_forecast
     tmrw_forecast   = weather.tomorrow_forecast
     conditions      = weather.conditions
     tmrw_conditions = weather.tomorrow_conditions
     weather_graph   = weather.graph
     sun             = weather.suntimes
+    moon            = weather.moon
 
     # use locals, but override with extra_vars
     formatting_variables = locals()

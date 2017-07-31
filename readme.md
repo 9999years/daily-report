@@ -5,75 +5,122 @@
 The Daily Report is a script to output a daily briefing — I’m hooking it up
 to a cron job and a receipt printer to print out an agenda for me daily.
 
-Run `gen_credentials.py` to generate a credential file.
-
 Usage:
 
     $ ./dailyreport.py
 
-    good morning!
-    today is wednesday, july 19
-                          2017-07-19
-    --------------------------------
-    72-91°F, 20% chance of precip.
-    partly cloudy
-    --------------------------------
-    94|øø····             ×××××××|15
-    89|  ××             ××       |12
-    85|    ×           ×         | 9
-    81|     ×××·······×          | 6
-    77|      ··××××  ×··         | 3
-    73|            ××   ·········| 0
-       6  9  12 3  6  9  12 3  6
-    --------------------------------
-    all day | parents gone (day 13
-            | of 16)
-    --------------------------------
-     8:00PM | egg drop soup w
-            | camille (& possibly
-            | aya)
-    --------------------------------
-    [] send immunization records
-    --------------------------------
-     16 | visit jay (2017-08-04)
-     39 | move in day (2017-08-27)
-    159 | christmas (2017-12-25)
-    285 | birthday (2018-04-30)
+             good morning!
+    today is sunday, july 30
+    7:43PM                2017-07-30
+    ════════════════════════════════
+             60-82°F, 10%p
+                 clear
+    6:08AM ↑      14:14     8:22PM ↓
+         ○ first quarter @ 53%
+    ────────────────────────────────
+    tomorrow: 65-85°F, 10%p
+                 clear
+    ════════════════════════════════
+    84║   │    ···    │××××××××  ║ 8
+    79║×  │  ··   ·  ××        ××║ 6
+    74║ × │ ·      ·× │          ║ 4
+    70║  ××¤×      ×· │         ·║ 3
+    65║   │  ×××× ×   │        · ║ 1
+    61║····      ×   ··········  ║ 0
+    °F×9  12 3  6  9  12 3  6  9 ·%p
+    ════════════════════════════════
+    all day ║ summer break (day 43
+            ║ of 60)
+    ────────────────────────────────
+    12:00PM ║ work at citysburg
+    ────────────────────────────────
+    [] get toothpaste
+    ────────────────────────────────
+      5 ║ visit jay (2017-08-04)
+     28 ║ move in day (2017-08-27)
+    148 ║ christmas (2017-12-25)
+    274 ║ birthday (2018-04-30)
 
 
-Make sure to read/edit `prefs.json`! It controls all of the program's behavior,
-from weather location to output format.
+Make sure to read/edit `prefs.json`! It controls **all** of the program's
+behavior, from weather location to output format. It is dense by design — I
+believe you should be able to completely change the output format to suit you
+without touching the code. Easy modifications for me are an advantage.
 
 Potential usage with `cron`, to print daily at 6am:
 
     0 6 * * * cd /home/pi/daily-report && git pull && ./dailyreport.py | lpr -l
 
-# Modules
+# Customization
 
-The Daily Report is split into modules of loosely associated output, each of
-which implements one or more output functions, which are mapped to replacement
-names.
+In the abstract, The Daily Report defines functions, referred to as format
+variables, that return strings of potentially interesting content, which are
+replaced by name in various [format strings][fmt-strings].
 
-1. `dates.py`
+The primary format string is `prefs.format` (`prefs` is defined in
+`prefs.json`, and I’ll use Javascript-syntax to refer to its keys for ease of
+use, because the `prefs['format']` syntax Python requires is unnecessarily
+verbose).
 
-    Date and Google Calendar handling interfaces. Depends on
-    `gen_credentials.py`.
-    1. Events
-       All-day and timed events
-            all day | parents gone (day 13
-                    | of 16)
-            --------------------------------
-             8:00PM | egg drop soup w
-                    | camille (& possibly
-                    | aya)
-            --------------------------------
-            [] send immunization records
-            --------------------------------
-             16 | visit jay (2017-08-04)
-             39 | move in day (2017-08-27)
-            159 | christmas (2017-12-25)
-            285 | birthday (2018-04-30)
+All format strings can be written as arrays which are joined by newlines before
+being parsed (to make breaking up long strings easier) or as a single string.
 
+All format strings have access to the global format variables, but many have
+access to their own, sometimes nested format variables.
+
+For example, the format of `{sun}`’s output is defined in
+`prefs.weather.sun_format`, which has access to `{sunrise}` (the sunrise time),
+`{daylight}` (the length of the day), and `{sunset}` (the sunset time). From
+there, `{sunrise}` is defined by `prefs.weather.sunrise_format`. It’s a little
+bit silly and certainly rather verbose but it allows you to truly make The
+Daily Report your own.
+
+## Format Variables
+
+### `{hrule}`
+
+Definition: `misc.hrule`.
+
+Description: A horizontal rule formed by repeating `prefs.horiz` `prefs.width`
+times. Multiple consecutive `{hrule}`s and `{thinhrule}`s are compressed into a
+single `{hrule}` in final output.
+
+Example output:
+
+    ================================
+
+### `{thinhrule}`
+
+Definition: `misc.thinhrule`.
+
+Description: A thinner horizontal rule, using `prefs.horiz_light` instead of
+`prefs.horiz` for the fill character. Multiple `{thinhrule}`s are condensed
+into a single `{thinhrule}` in final output.
+
+Example output:
+
+    --------------------------------
+
+### `{today}`
+
+Definition: `dates.today_date`
+
+Description: Today’s date, human-style. Hopefully more customizable in the
+future.
+
+Example output: `today is sunday, july 30`
+
+### `{iso_date}`
+
+Definition: `dates.iso_date`
+
+Description: [ISO 8601][iso8601]-compliant date.
+
+Example output: `2017-07-30`
+
+### More
+
+Coming soon!
 
 # Dependencies
 
@@ -153,3 +200,5 @@ to do a few things.
 [creds]: https://console.cloud.google.com/apis/credentials
 [proj]: https://console.cloud.google.com/projectcreate
 [uni2esky]: https://pypi.python.org/pypi/uni2esky
+[fmt-strings]: https://docs.python.org/3/library/string.html#format-string-syntax
+[iso8601]: https://en.m.wikipedia.org/wiki/ISO_8601
