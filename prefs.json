@@ -13,7 +13,8 @@
 		"{work()}", "{thinhrule()}",
 		"{todo()}", "{thinhrule()}",
 		"{calendar()}", "{thinhrule()}",
-		"{countdown()}",
+		"{countdown()}", "{hrule()}",
+		"{twitter('dril')}",
 		"\n\n\n\n"
 	],
 	"google_key_path": "google_keys.json",

@@ -8,10 +8,10 @@ from prefdicts import prefs, keys
 
 def get_api():
     return twitter.Api(
-        consumer_key=prefs.keys['twitter']['consumer_key'],
-        consumer_secret=prefs.keys['twitter']['consumer_secret'],
-        access_token_key=prefs.keys['twitter']['access_token'],
-        access_token_secret=prefs.keys['twitter']['access_token_secret']
+        consumer_key=keys['twitter']['consumer_key'],
+        consumer_secret=keys['twitter']['consumer_secret'],
+        access_token_key=keys['twitter']['access_token'],
+        access_token_secret=keys['twitter']['access_token_secret']
     )
 
 def get_tweets(user='dril'):
