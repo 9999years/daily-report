@@ -8,7 +8,7 @@ from time import sleep
 
 from prefdicts import prefs, keys
 import misc
-from reportformatter import formatter
+from extendedformatter import formatter, extformat
 
 # dict of runtime caches, to avoid double requests
 cache = {}
@@ -138,7 +138,7 @@ def day_forecast(day=0):
     day_data = forecast['simpleforecast']['forecastday'][day]
     txt_data = forecast['txt_forecast']['forecastday'][day]
 
-    return formatter.format(prefs['weather']['forecast_format'],
+    return extformat(prefs['weather']['forecast_format'],
         forecast=forecast,
         day_data=day_data,
         txt_data=txt_data,
@@ -182,19 +182,19 @@ def suntimes():
     risetime, settime = sunrise(), sunset()
     daylight = settime - risetime
 
-    risefmt = formatter.format(
+    risefmt = extformat(
         prefs['weather']['sun']['rise_format'],
         sunrise=misc.hoursminutes(risetime, pad=''))
 
-    setfmt = formatter.format(
+    setfmt = extformat(
         prefs['weather']['sun']['set_format'],
         sunset=misc.hoursminutes(settime, pad=''))
 
-    dayfmt = formatter.format(
+    dayfmt = extformat(
         prefs['weather']['sun']['daylight_format'],
         daylight=misc.formatdelta(daylight, clock=24))
 
-    return formatter.format(
+    return extformat(
         prefs['weather']['sun']['format'],
         sunrise =risefmt,
         sunset  =setfmt,
@@ -208,7 +208,7 @@ def moon():
         if int(times['percentIlluminated']) > 50
         else prefs['weather']['moon']['dark_graphic'])
 
-    return formatter.format(prefs['weather']['moon']['format'],
+    return extformat(prefs['weather']['moon']['format'],
         **locals())
 
 def main():

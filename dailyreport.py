@@ -9,7 +9,7 @@ import gen_credentials as creds
 from prefdicts import prefs, keys
 import prefhelpers
 import misc
-from reportformatter import formatter
+from extendedformatter import formatter, extformat
 import weather
 import dates
 import misc
@@ -48,7 +48,9 @@ def report():
         moon            = weather.moon,
     )
 
-    return formatter.format(prefs['format'])
+    msg = extformat(prefs['format'])
+
+    return misc.deduplicate_rules(msg)
 
 def main():
     parser = argparse.ArgumentParser(

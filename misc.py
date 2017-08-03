@@ -1,7 +1,6 @@
 import textwrap
 import datetime
 import re
-from string import Formatter
 
 # local
 from prefdicts import prefs, keys
