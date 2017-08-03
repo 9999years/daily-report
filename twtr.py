@@ -4,14 +4,14 @@ import dates
 import textwrap
 
 # local
-import prefs
+from prefdicts import prefs, keys
 
 def get_api():
     return twitter.Api(
-        consumer_key=prefs.keys['twitter']['consumer_key'],
-        consumer_secret=prefs.keys['twitter']['consumer_secret'],
-        access_token_key=prefs.keys['twitter']['access_token'],
-        access_token_secret=prefs.keys['twitter']['access_token_secret']
+        consumer_key=keys['twitter']['consumer_key'],
+        consumer_secret=keys['twitter']['consumer_secret'],
+        access_token_key=keys['twitter']['access_token'],
+        access_token_secret=keys['twitter']['access_token_secret']
     )
 
 def get_tweets(user='dril'):
@@ -19,14 +19,15 @@ def get_tweets(user='dril'):
     return api.GetUserTimeline(screen_name=user)
 
 def get_date(tweet):
-    # Tue Jul 18 03:44:48 +0000 2017
+    """Tue Jul 18 03:44:48 +0000 2017
+    """
     return datetime.datetime.strptime(tweet.created_at,
         '%a %b %d %H:%M:%S %z %Y')
 
 def format(tweet):
     date = get_date(tweet)
     return (textwrap.fill(f'@{tweet.user.screen_name}: {tweet.text}',
-            width=prefs.prefs['width'])
+            width=prefs['width'])
         + f'\n{tweet.favorite_count} likes, {tweet.retweet_count} rts\n'
         + datetime.datetime.strftime(date, '%Y-%m-%d %I:%M:%S %p'))
 

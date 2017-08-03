@@ -2,62 +2,55 @@
 import argparse
 from sys import stdout
 import re
+import uni2esky
 
 # local imports
 import gen_credentials as creds
-import prefs
+from prefdicts import prefs, keys
+import prefhelpers
+import misc
+from extendedformatter import formatter, extformat
 import weather
 import dates
 import misc
 import twtr
-import uni2esky
+import maze
 
-def report(args=None):
-    prefs.get_prefs()
+def report():
+    # refresh prefs
+    prefs, keys = prefhelpers.get_prefs()
 
-    msg = '\n'.join(prefs.prefs['format'])
+    # Tab /=\|\./l1r1r0l0
 
-    def replace(txt, replacement):
-        nonlocal msg
-        txt = '{' + txt + '}'
-        if txt in msg:
-            if callable(replacement):
-                # function for lazy eval.
-                msg = msg.replace(txt, replacement())
-            else:
-                # string
-                msg = msg.replace(txt, replacement)
+    formatter.extend_env(
+        hrule           =    misc.hrule,
+        thinhrule       =    misc.thinhrule,
+        center          =    misc.center,
+        right           =    misc.right,
+        left_pad        =    misc.right,
+        align           =    misc.align,
+        fill            =    misc.fill,
+        today           =   dates.today_date,
+        now_hm          =   dates.now_hm,
+        iso_date        =   dates.iso_date,
+        calendar        =   dates.events,
+        countdown       =   dates.today_countdowns,
+        todo            =   dates.today_todos,
+        work            =   dates.today_work,
+        twitter         =    twtr.last,
+        maze            =    maze.from_prefs,
+        forecast        = weather.today_forecast,
+        tmrw_forecast   = weather.tomorrow_forecast,
+        conditions      = weather.conditions,
+        tmrw_conditions = weather.tomorrow_conditions,
+        weather_graph   = weather.graph,
+        sun             = weather.suntimes,
+        moon            = weather.moon,
+    )
 
-    # by passing functions we don't evaluate unless included in
-    # prefs['format'] --- no weather api calls if you don't want weather, etc.
-    replacements = {
-        ('hrule',          misc.hrule),
-        ('today',          dates.today_date),
-        ('iso_date',       dates.iso_date),
-        ('short_forecast', weather.forecast),
-        ('weather_graph',  weather.graph),
-        ('calendar',       dates.events),
-        ('countdown',      dates.today_countdowns),
-        ('todo',           dates.today_todos),
-        ('twitter',        twtr.last)
-    }
+    msg = extformat(prefs['format'])
 
-    # not implemented:
-    # valid:
-    # {xxx:(...)}
-    #    or
-    # {xxx}
-    # literal:
-    # {{xxx}}
-
-    for replacement, fn in replacements:
-        replace(replacement, fn)
-
-    # empty sections surrounded by hrules can look silly
-    # make them one hrule instead
-    msg = re.sub('(' + misc.hrule() + r'\n*){2,}', misc.hrule() + '\n', msg)
-
-    return msg
+    return misc.deduplicate_rules(msg)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -65,7 +58,7 @@ def main():
     )
 
     parser.add_argument('-e', '--encoding', type=str, default='utf-8',
-        help='Output encoding. Default is UTF-8.')
+        help='Output encoding. Default is UTF-8. Irrelevant with --print')
 
     parser.add_argument('-p', '--print', action='store_true',
         help='Printing output --- converts codepoints to Esky escapes.')
@@ -74,7 +67,8 @@ def main():
 
     msg = report()
     if args.print:
-        stdout.buffer.write(uni2esky.encode(msg))
+        msg = b'\x1b\x33\x18' + uni2esky.encode(msg)
+        stdout.buffer.write(msg)
     else:
         stdout.buffer.write(msg.encode(args.encoding, errors='replace'))
 

@@ -1,24 +1,22 @@
 {
 	"format": [
-		"good morning!",
-		"{today}",
-		"{iso_date}",
-		"{hrule}",
-		"{short_forecast}",
-		"{hrule}",
-		"{weather_graph}",
-		"{hrule}",
-		"{calendar}",
-		"{hrule}",
-		"{todo}",
-		"{hrule}",
-		"{countdown}",
-		"\n\n\n"
+		"{center('good morning!')}",
+		"{center(today().lower())}",
+		"{align(now_hm(), '', iso_date())}", "{hrule()}",
+		"{center(forecast())}",
+		"{center(conditions().lower())}",
+		"{sun()}",
+		"{center(moon())}", "{thinhrule()}",
+		"{center('tomorrow: ' + tmrw_forecast())}",
+		"{center(tmrw_conditions().lower())}", "{hrule()}",
+		"{weather_graph()}", "{hrule()}",
+		"{work()}", "{thinhrule()}",
+		"{todo()}", "{thinhrule()}",
+		"{calendar()}", "{thinhrule()}",
+		"{countdown()}", "{hrule()}",
+		"{twitter('dril')}",
+		"\n\n\n\n"
 	],
-	"location": {
-		"state": "va",
-		"city": "reston"
-	},
 	"google_key_path": "google_keys.json",
 	"google_credential_path": "google_credentials.json",
 	"app_name": "the daily report",
@@ -29,18 +27,44 @@
 	"vert": "║",
 	"vert_light": "│",
 	"weather": {
+		"location": "va/reston",
 		"height": 6,
 		"chars": {
-			"precip": "○",
+			"precip": "·",
 			"temp":   "×",
 			"both":   "¤"
-		}
+		},
+		"max_retries": 3,
+		"forecast_format": "{low}-{high}°F, {precip}%p",
+		"moon": {
+			"bright_graphic": "○",
+			"dark_graphic": "●",
+			"format": "{graphic} {phase} @ {percent}%"
+		},
+		"sun": {
+			"rise_format": "{sunrise} ↑",
+			"set_format": "{sunset} ↓",
+			"daylight_format": "{daylight}",
+			"format": "{align(sunrise, daylight, sunset)}"
+		},
+		"temp": "fahrenheit"
+	},
+	"dates": {
+		"today_format": "today is %A, %b %d"
 	},
 	"calendar": {
 		"scope": "https://www.googleapis.com/auth/calendar.readonly",
 		"todo_pat": "to.?do",
 		"countdown_pat": "count.?downs?",
+		"work_pat": ".*work.*",
 		"todo_check": "[] ",
 		"max_countdowns": 10
+	},
+	"maze": {
+		"height": 10,
+		"style": "random",
+		"halves": false,
+		"start": "S",
+		"end": "E"
 	}
 }
