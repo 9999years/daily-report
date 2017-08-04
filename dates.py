@@ -49,7 +49,6 @@ def today_events(calendar='primary', **kwargs):
         'calendarId':    calendar,
         'orderBy':       'startTime',
         'singleEvents':  True,
-        'orderBy':       'startTime',
         'timeMin':       today.isoformat(),
         'timeMax':       tomorrow.isoformat()
     }
@@ -118,23 +117,25 @@ def format_event(time, event):
     return misc.format_left(event['summary'],
         leader=leader, firstline=time + leader)
 
+def format_todos(todos):
+    """takes a list of strings and returns a formatted list of todos"""
+    ret = ''
+    for todo in todos:
+        ret += misc.format_left(todo,
+            firstline=prefs['calendar']['todo_check'])
+    return ret
 
 def today_todos():
-    todo_cals = calendar_match(prefs['calendar']['todo_pat'])
-    ret = ''
-
-    def add_todo(event):
-        nonlocal ret
-        ret += misc.format_left(event['summary'],
-            firstline=prefs['calendar']['todo_check'])
-        pass
-
     todos = []
+    todo_cals = calendar_match(prefs['calendar']['todo_pat'])
     for cal in todo_cals:
         todos.extend(today_events(cal['id'], orderBy='updated'))
 
+    todo_list = []
     for todo in todos:
-        add_todo(todo)
+        todo_list.append(todo['summary'])
+
+    ret = format_todos(todo_list)
 
     return ret.rstrip()
 
