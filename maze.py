@@ -69,7 +69,7 @@ class Cell():
             + int(bottom.right) * south
             + int(right.bottom) * east)
 
-def gen(w, h):
+def gen(w=prefs['width'], h=prefs['maze']['height']):
     if h < 3 or w < 3:
         return 'maze width and height MUST be ≥3'
 

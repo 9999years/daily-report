@@ -1,6 +1,8 @@
 import textwrap
 import datetime
 import re
+import subprocess
+import shlex
 
 # local
 from prefdicts import prefs, keys
@@ -50,7 +52,7 @@ def format_left(txt, leader='',
 def center(txt, width=prefs['width'], fillchar=' '):
     return txt.center(width, fillchar)
 
-def align(left='', center='', right='', width=prefs['width']):
+def align(left='', center='', right='', width=prefs['width'], fillchar=' '):
     """
     returns a string aligned to `width`, with `left`, `right`, and `center` at
     their respective locations in the string. `center` will destructively
@@ -58,7 +60,7 @@ def align(left='', center='', right='', width=prefs['width']):
 
     like a stronger left_pad
     """
-    lr = left + right.rjust(width)[len(left):]
+    lr = left + right.rjust(width, fillchar)[len(left):]
 
     c = width // 2
     halfc = int(c - len(center) / 2)
@@ -106,3 +108,9 @@ def deduplicate_rules(msg):
     # hrules
     return re.sub('((' + hrule() + '|' + thinhrule() + r')\n*){2,}',
         hrule() + '\n', msg)
+
+def shell(prog, opts=[]):
+    dispatch = shlex.split(prog)
+    dispatch.extend(opts)
+    result = subprocess.run(dispatch, stdout=subprocess.PIPE)
+    return result.stdout.decode('utf-8')

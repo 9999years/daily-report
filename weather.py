@@ -160,11 +160,11 @@ def conditions(day=0):
 def tomorrow_conditions():
     return conditions(day=1)
 
-def today_forecast():
-    return day_forecast(day=0)
+def today_forecast(day=0):
+    return day_forecast(day=day)
 
-def tomorrow_forecast():
-    return day_forecast(day=1)
+def tomorrow_forecast(day=1):
+    return day_forecast(day=day)
 
 def parsesuntime(t):
     return datetime.datetime.strptime(

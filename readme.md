@@ -53,74 +53,7 @@ Potential usage with `cron`, to print daily at 6am:
 
 # Customization
 
-In the abstract, The Daily Report defines functions, referred to as format
-variables, that return strings of potentially interesting content, which are
-replaced by name in various [format strings][fmt-strings].
-
-The primary format string is `prefs.format` (`prefs` is defined in
-`prefs.json`, and I’ll use Javascript-syntax to refer to its keys for ease of
-use, because the `prefs['format']` syntax Python requires is unnecessarily
-verbose).
-
-All format strings can be written as arrays which are joined by newlines before
-being parsed (to make breaking up long strings easier) or as a single string.
-
-All format strings have access to the global format variables, but many have
-access to their own, sometimes nested format variables.
-
-For example, the format of `{sun}`’s output is defined in
-`prefs.weather.sun_format`, which has access to `{sunrise}` (the sunrise time),
-`{daylight}` (the length of the day), and `{sunset}` (the sunset time). From
-there, `{sunrise}` is defined by `prefs.weather.sunrise_format`. It’s a little
-bit silly and certainly rather verbose but it allows you to truly make The
-Daily Report your own.
-
-## Format Variables
-
-### `{hrule}`
-
-Definition: `misc.hrule`.
-
-Description: A horizontal rule formed by repeating `prefs.horiz` `prefs.width`
-times. Multiple consecutive `{hrule}`s and `{thinhrule}`s are compressed into a
-single `{hrule}` in final output.
-
-Example output:
-
-    ================================
-
-### `{thinhrule}`
-
-Definition: `misc.thinhrule`.
-
-Description: A thinner horizontal rule, using `prefs.horiz_light` instead of
-`prefs.horiz` for the fill character. Multiple `{thinhrule}`s are condensed
-into a single `{thinhrule}` in final output.
-
-Example output:
-
-    --------------------------------
-
-### `{today}`
-
-Definition: `dates.today_date`
-
-Description: Today’s date, human-style. From `prefs.dates.today_format`, as a
-[`strftime` escape][strftime]
-
-Example output: `today is sunday, july 30`
-
-### `{iso_date}`
-
-Definition: `dates.iso_date`
-
-Description: [ISO 8601][iso8601]-compliant date.
-
-Example output: `2017-07-30`
-
-### More
-
-Coming soon!
+See [`customization.md`][cust] for details on how to customize The Daily Report.
 
 # Dependencies
 
@@ -200,3 +133,4 @@ to do a few things.
 [fmt-strings]: https://docs.python.org/3/library/string.html#format-string-syntax
 [iso8601]: https://en.m.wikipedia.org/wiki/ISO_8601
 [strftime]: https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
+[cust]: ./blob/master/customization.md

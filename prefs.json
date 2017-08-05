@@ -50,7 +50,9 @@
 		"temp": "fahrenheit"
 	},
 	"dates": {
-		"today_format": "today is %A, %b %d"
+		"today_format": "today is %A, %b %d",
+		"hours": 12,
+		"all_day": "all day"
 	},
 	"calendar": {
 		"scope": "https://www.googleapis.com/auth/calendar.readonly",
@@ -66,5 +68,12 @@
 		"halves": false,
 		"start": "S",
 		"end": "E"
+	},
+	"twitter": {
+		"tweet_format": [
+			"@{user['screen_name']}: {pretty_text}",
+			"{favorite_count} likes, {retweet_count} rts",
+			"{format(date, '%Y-%m-%d %I:%M:%S %p')}"
+		]
 	}
 }

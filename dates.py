@@ -41,9 +41,12 @@ def today_times():
 
     return today, tomorrow
 
-def today_events(calendar='primary', **kwargs):
+def today_events(calendar='primary', day=0, **kwargs):
     credentials, http, service = creds.build_creds()
     today, tomorrow = today_times()
+
+    tomorrow += datetime.timedelta(days=day)
+    today    += datetime.timedelta(days=day)
 
     args = {
         'calendarId':    calendar,
@@ -189,10 +192,10 @@ def today_work():
 
     return out.rstrip()
 
-def events():
+def events(day=0):
     today, tomorrow = today_times()
 
-    events = today_events()
+    events = today_events(day=day)
     alldays = []
     todays = []
     for event in events:
@@ -204,7 +207,7 @@ def events():
 
     out = ''
     for event in alldays:
-        out += format_event('all day', event)
+        out += format_event(prefs['dates']['all_day'], event)
 
     out += misc.thinhrule() + '\n'
 
@@ -213,11 +216,12 @@ def events():
 
     return out.rstrip()
 
-def today_date():
-    return today_times()[0].strftime(prefs['dates']['today_format'])
+def today_date(day=0):
+    return (today_times()[0] + datetime.timedelta(days=day)).strftime(
+        prefs['dates']['today_format'])
 
-def now_hm():
-    return misc.hoursminutes(datetime.datetime.now(), pad='')
+def now_hm(fillchar=''):
+    return misc.hoursminutes(datetime.datetime.now(), pad=fillchar)
 
 def iso_date():
     return today_times()[0].strftime('%Y-%m-%d')
