@@ -27,7 +27,7 @@
 	"vert": "║",
 	"vert_light": "│",
 	"weather": {
-		"location": "va/reston",
+		"location": "in/south_bend",
 		"height": 6,
 		"chars": {
 			"precip": "·",
@@ -51,8 +51,9 @@
 	},
 	"dates": {
 		"today_format": "today is %A, %b %d",
-		"hours": 24,
-		"all_day": "all day"
+		"hours": 12,
+		"all_day": "all day",
+		"ending": "→{hm}"
 	},
 	"calendar": {
 		"scope": "https://www.googleapis.com/auth/calendar.readonly",

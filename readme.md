@@ -78,6 +78,7 @@ A larger barrier to entry will be the API keys:
 # Functionality coming soon, maybe
 
 * Stock module (hook up with Yahoo Finance?)
+* Output like Unix `cal(1)`
 * ???
 
 # APIs

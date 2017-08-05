@@ -11,6 +11,7 @@ import textwrap
 import misc
 import gen_credentials as creds
 from prefs import prefs, keys
+from formatter import extformat
 
 def timezone():
     delt = datetime.datetime.now() - datetime.datetime.utcnow()
@@ -115,9 +116,13 @@ def format_event(time, event):
 
     leader = ' ' + prefs['vert'] + ' '
     if time == prefs['dates']['all_day'] and event['duration'].days > 1:
+        time = extformat(prefs['dates']['ending'], event)
         event['summary'] += (' (day '
             + str((today - event['start']).days + 1) + ' of '
             + str((event['end'] - event['start']).days) + ')')
+    elif time == prefs['dates']['ending']:
+        time = extformat(prefs['dates']['ending'],
+            event, hm=misc.hoursminutes(event['end']))
 
     return misc.format_left(event['summary'],
         leader=leader, firstline=time + leader)
@@ -187,36 +192,48 @@ def today_work():
     for cal in work_cals:
         shifts.extend(today_events(cal['id']))
 
-    out = ''
+    out = []
     for shift in shifts:
         shift = event_times(shift)
-        out += format_event(misc.hoursminutes(shift['start']), shift)
+        out.append(format_event(misc.hoursminutes(shift['start']), shift))
 
-    return out.rstrip()
+    return ''.join(out).rstrip()
 
 def events(day=0):
     today, tomorrow = today_times(day)
 
     events = today_events(day=day)
     alldays = []
+    endings = []
     todays = []
     for event in events:
         event = event_times(event)
         if event['start'] <= today and event['end'] >= tomorrow:
+            # all day!
             alldays.append(event)
+        elif event['start'] <= today and event['end'] <= tomorrow:
+            # multi-day event (like an all-day) that we’re not in the middle of
+            endings.append(event)
         else:
             todays.append(event)
 
-    out = ''
+    out = []
     for event in alldays:
-        out += format_event(prefs['dates']['all_day'], event)
+        out.append(format_event(prefs['dates']['all_day'], event))
 
-    out += misc.thinhrule() + '\n'
+    out.append(misc.thinhrule() + '\n')
+
+    # TODO: this is so massively unclear. nobody who hasnt written this program
+    # will ever know what it means
+    for event in endings:
+        out.append(format_event(prefs['dates']['ending'], event))
+
+    out.append(misc.thinhrule() + '\n')
 
     for event in todays:
-        out += format_event(misc.hoursminutes(event['start']), event)
+        out.append(format_event(misc.hoursminutes(event['start']), event))
 
-    return out.rstrip()
+    return ''.join(out).rstrip()
 
 def today_date(day=0):
     return format(today_times(day)[0], prefs['dates']['today_format'])
