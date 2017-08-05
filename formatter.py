@@ -11,6 +11,7 @@ import weather
 # Tab /=\|\./l1r1r0l0
 
 formatter.extend_env(
+
     hrule           =    misc.hrule,
     thinhrule       =    misc.thinhrule,
     center          =    misc.center,
@@ -18,6 +19,8 @@ formatter.extend_env(
     left_pad        =    misc.right,
     align           =    misc.align,
     fill            =    misc.fill,
+    hm              =    misc.hoursminutes,
+    shell           =    misc.shell,
     today           =   dates.today_date,
     now_hm          =   dates.now_hm,
     iso_date        =   dates.iso_date,
@@ -34,4 +37,7 @@ formatter.extend_env(
     weather_graph   = weather.graph,
     sun             = weather.suntimes,
     moon            = weather.moon,
+
 )
+
+formatter.width = prefs['width']

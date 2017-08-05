@@ -1,14 +1,14 @@
 {
 	"format": [
-		"{center('good morning!')}",
-		"{center(today().lower())}",
-		"{align(now_hm(), '', iso_date())}", "{hrule()}",
-		"{center(forecast())}",
-		"{center(conditions().lower())}",
+		"{'good morning!'!c}",
+		"{today()!lc}",
+		"{align(left=now_hm(), right=iso_date())}", "{hrule()}",
+		"{forecast()!c}",
+		"{conditions()!lc}",
 		"{sun()}",
-		"{center(moon())}", "{thinhrule()}",
-		"{center('tomorrow: ' + tmrw_forecast())}",
-		"{center(tmrw_conditions().lower())}", "{hrule()}",
+		"{moon()!c}", "{thinhrule()}",
+		"{'tomorrow: ' + tmrw_forecast()!c}",
+		"{tmrw_conditions()!lc}", "{hrule()}",
 		"{weather_graph()}", "{hrule()}",
 		"{work()}", "{thinhrule()}",
 		"{todo()}", "{thinhrule()}",
@@ -53,7 +53,7 @@
 		"today_format": "today is %A, %b %d",
 		"hours": 12,
 		"all_day": "all day",
-		"ending": "→{hm}"
+		"ending": "→{time}"
 	},
 	"calendar": {
 		"scope": "https://www.googleapis.com/auth/calendar.readonly",

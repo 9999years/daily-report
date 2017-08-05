@@ -122,7 +122,7 @@ def format_event(time, event):
             + str((event['end'] - event['start']).days) + ')')
     elif time == prefs['dates']['ending']:
         time = extformat(prefs['dates']['ending'],
-            event, hm=misc.hoursminutes(event['end']))
+            event, time=misc.hoursminutes(event['end']))
 
     return misc.format_left(event['summary'],
         leader=leader, firstline=time + leader)
