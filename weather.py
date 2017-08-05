@@ -8,7 +8,7 @@ from time import sleep
 
 from prefs import prefs, keys
 import misc
-from extendedformatter import formatter, extformat
+from formatter import extformat
 
 # dict of runtime caches, to avoid double requests
 cache = {}
@@ -30,7 +30,12 @@ def weather(endpoint, retries=2):
 
     # request and retry up to `retries` times
     for i in range(retries):
-        r = requests.get(url)
+        try:
+            r = requests.get(url)
+        except requests.exceptions.ConnectionError:
+            print(f'Connection to Wunderground endpoint {endpoint} failed.',
+                'This is an error with your network connection and',
+                'not Wundeground. Charging ahead as if nothing went wrong.')
         if r.status_code == requests.codes.ok:
             break
         else:
@@ -184,15 +189,15 @@ def suntimes():
 
     risefmt = extformat(
         prefs['weather']['sun']['rise_format'],
-        sunrise=misc.hoursminutes(risetime, pad=''))
+        sunrise=misc.hoursminutes(risetime, fillchar=''))
 
     setfmt = extformat(
         prefs['weather']['sun']['set_format'],
-        sunset=misc.hoursminutes(settime, pad=''))
+        sunset=misc.hoursminutes(settime, fillchar=''))
 
     dayfmt = extformat(
         prefs['weather']['sun']['daylight_format'],
-        daylight=misc.formatdelta(daylight, clock=24))
+        daylight=misc.formatdelta(daylight))
 
     return extformat(
         prefs['weather']['sun']['format'],

@@ -5,7 +5,7 @@ import textwrap
 
 # local
 from prefs import prefs, keys
-from extendedformatter import extformat
+from formatter import extformat
 import misc
 
 def get_api():
@@ -27,9 +27,16 @@ def get_date(tweet):
         '%a %b %d %H:%M:%S %z %Y')
 
 def format_tweet(tweet):
-    date = get_date(tweet)
-    pretty_text = misc.fill(tweet.text.replace('\n', '\n\n'))
-    return extformat(prefs['twitter']['tweet_format'], tweet.AsDict(), date=date)
+    fvars = tweet.AsDict()
+    fvars.update({
+        'date': get_date(tweet),
+    })
+    fvars.update({
+        'pretty_text': misc.fill(extformat(
+            prefs['twitter']['pretty_format'],
+            fvars, text=tweet.text.replace('\n', '\n\n')))
+    })
+    return extformat(prefs['twitter']['format'], fvars)
 
 def since_yesterday(user='dril'):
     tweets = get_tweets(user)

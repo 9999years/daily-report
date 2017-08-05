@@ -134,9 +134,9 @@ Example output: `2017-07-30`
 
 Definition: `dates.now_hm`
 
-Description: Outputs the current time in hours/minutes. In the future, this will
-respect `prefs.dates.hours` and output 24-hour time. Note that output can always
-be a constant width with the `fillchar` kwarg set to `' '`, for easy alignment.
+Description: Outputs the current time in hours/minutes. If `prefs.dates.hours`
+is 24, `now_hm` will output 24-hour times. Note that output can always be a
+constant width with the `fillchar` kwarg set to `' '`, for easy alignment.
 
 Example output: ` 4:43PM`
 

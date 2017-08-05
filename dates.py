@@ -29,7 +29,7 @@ def timezone():
     return datetime.timezone(delt)
 
 
-def today_times():
+def today_times(offset=0):
     # get today at midnight and tomorrow at midnight so we can fetch
     # events for today
     zone = timezone()
@@ -39,14 +39,14 @@ def today_times():
 
     tomorrow = today + datetime.timedelta(days=1)
 
+    today    += datetime.timedelta(days=offset)
+    tomorrow += datetime.timedelta(days=offset)
+
     return today, tomorrow
 
 def today_events(calendar='primary', day=0, **kwargs):
     credentials, http, service = creds.build_creds()
-    today, tomorrow = today_times()
-
-    tomorrow += datetime.timedelta(days=day)
-    today    += datetime.timedelta(days=day)
+    today, tomorrow = today_times(day)
 
     args = {
         'calendarId':    calendar,
@@ -111,10 +111,12 @@ def event_times(event):
     return event
 
 def format_event(time, event):
+    today, tomorrow = today_times()
+
     leader = ' ' + prefs['vert'] + ' '
-    if time == 'all day' and event['duration'].days > 1:
+    if time == prefs['dates']['all_day'] and event['duration'].days > 1:
         event['summary'] += (' (day '
-            + str((today - event['start']).days) + ' of '
+            + str((today - event['start']).days + 1) + ' of '
             + str((event['end'] - event['start']).days) + ')')
 
     return misc.format_left(event['summary'],
@@ -193,7 +195,7 @@ def today_work():
     return out.rstrip()
 
 def events(day=0):
-    today, tomorrow = today_times()
+    today, tomorrow = today_times(day)
 
     events = today_events(day=day)
     alldays = []
@@ -217,11 +219,10 @@ def events(day=0):
     return out.rstrip()
 
 def today_date(day=0):
-    return (today_times()[0] + datetime.timedelta(days=day)).strftime(
-        prefs['dates']['today_format'])
+    return format(today_times(day)[0], prefs['dates']['today_format'])
 
 def now_hm(fillchar=''):
-    return misc.hoursminutes(datetime.datetime.now(), pad=fillchar)
+    return misc.hoursminutes(datetime.datetime.now(), fillchar=fillchar)
 
-def iso_date():
-    return today_times()[0].strftime('%Y-%m-%d')
+def iso_date(day=0):
+    return today_times(day)[0].strftime('%Y-%m-%d')

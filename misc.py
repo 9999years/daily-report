@@ -8,7 +8,7 @@ import shlex
 from prefs import prefs, keys
 
 def fill(txt, width=prefs['width'], **kwargs):
-    return textwrap.fill(txt, **kwargs)
+    return textwrap.fill(txt, width=width, **kwargs)
 
 def left(txt, width=prefs['width'], fillchar=' '):
     return txt.ljust(width, fillchar)
@@ -67,25 +67,27 @@ def align(left='', center='', right='', width=prefs['width'], fillchar=' '):
 
     return lr[:halfc] + center + lr[halfc + len(center):]
 
-def hoursminutes(time, pad=' '):
-    hrs = datetime.datetime.strftime(time, '%I')
-    # pad with spaces instead of 0s
-    if hrs[0] == '0':
-        hrs = pad + hrs[1:]
-    return hrs + ':' + datetime.datetime.strftime(time, '%M%p')
+def hoursminutes(time, fillchar=' '):
+    fmt = '%I'
+    if prefs['dates']['hours'] == 24:
+        # 24 hr time
+        fmt = '%H'
+    fmt += ':%M'
+    if prefs['dates']['hours'] == 12:
+        # add am/pm
+        fmt += '%p'
 
-def formatdelta(time, clock=12):
+    # pad with spaces instead of 0s
+    # only replaces the first digit so we don’t have to worry about
+    # 00 oclock in 24hr time
+    ret = format(time, fmt)
+    if ret[0] == '0':
+        ret = fillchar + ret[1:]
+    return ret
+
+def formatdelta(time):
     days = time.days
     hrs  = time.seconds // 3600 # 60 × 60
-    if clock == 12:
-        if hrs > 12:
-            hrs -= 12
-            ampm = 'PM'
-        else:
-            ampm = 'AM'
-    else:
-        ampm = ''
-
     secs = time.seconds  % 3600
     mins = secs // 60
     secs = secs  % 60
@@ -95,7 +97,6 @@ def formatdelta(time, clock=12):
     ret += f'{hrs: 2}:{mins:02}'
     if secs != 0:
         ret += f'::{secs:02}'
-    ret += ampm
     return ret
 
 def deduplicate_rules(msg):

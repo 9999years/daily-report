@@ -12,7 +12,7 @@
 		"{weather_graph()}", "{hrule()}",
 		"{work()}", "{thinhrule()}",
 		"{todo()}", "{thinhrule()}",
-		"{calendar()}", "{thinhrule()}",
+		"{events()}", "{thinhrule()}",
 		"{countdown()}", "{hrule()}",
 		"{twitter('dril')}",
 		"\n\n\n\n"
@@ -51,7 +51,7 @@
 	},
 	"dates": {
 		"today_format": "today is %A, %b %d",
-		"hours": 12,
+		"hours": 24,
 		"all_day": "all day"
 	},
 	"calendar": {
@@ -70,10 +70,11 @@
 		"end": "E"
 	},
 	"twitter": {
-		"tweet_format": [
-			"@{user['screen_name']}: {pretty_text}",
+		"pretty_format": "@{user['screen_name']}: {text}",
+		"format": [
+			"{pretty_text}", "{thinhrule()}",
 			"{favorite_count} likes, {retweet_count} rts",
-			"{format(date, '%Y-%m-%d %I:%M:%S %p')}"
+			"{format(date, '%Y-%m-%d %I:%M:%S%p')}"
 		]
 	}
 }
