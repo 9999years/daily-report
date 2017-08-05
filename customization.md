@@ -344,3 +344,11 @@ variable | description | example
 `sunrise` | sunrise time | 5:28AM
 `sunset` | sunset time | 8:50PM
 `daylight` | daylight time, in hours and minutes | 14:28
+
+### `twitter`
+
+variable | description | example
+---------|-------------|---------
+`date` | datetime of tweet |
+`pretty_format` | format in `prefs.twitter.pretty_format` |
+everything else in a `tweet.AsDict()` ||

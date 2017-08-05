@@ -116,7 +116,7 @@ def format_event(time, event):
 
     leader = ' ' + prefs['vert'] + ' '
     if time == prefs['dates']['all_day'] and event['duration'].days > 1:
-        time = extformat(prefs['dates']['ending'], event)
+        time = extformat(prefs['dates']['all_day'], event)
         event['summary'] += (' (day '
             + str((today - event['start']).days + 1) + ' of '
             + str((event['end'] - event['start']).days) + ')')
@@ -159,7 +159,7 @@ def today_countdowns():
     ret = ''
     def add_countdown(event):
         nonlocal ret
-        event['summary'] += event['start'].strftime(' (%Y-%m-%d)')
+        event['summary'] += format(event['start'], ' (%Y-%m-%d)')
         leader = ' ' + prefs['vert'] + ' '
         ret += misc.format_left(event['summary'],
             leader=leader,
@@ -242,4 +242,4 @@ def now_hm(fillchar=''):
     return misc.hoursminutes(datetime.datetime.now(), fillchar=fillchar)
 
 def iso_date(day=0):
-    return today_times(day)[0].strftime('%Y-%m-%d')
+    return format(today_times(day)[0], '%Y-%m-%d')

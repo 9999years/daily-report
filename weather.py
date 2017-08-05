@@ -33,7 +33,8 @@ def weather(endpoint, retries=2):
         try:
             r = requests.get(url)
         except requests.exceptions.ConnectionError:
-            print(f'Connection to Wunderground endpoint {endpoint} failed.',
+            raise requests.exceptions.ConnectionError(
+                f'Connection to Wunderground endpoint {endpoint} failed.',
                 'This is an error with your network connection and',
                 'not Wundeground. Charging ahead as if nothing went wrong.')
         if r.status_code == requests.codes.ok:

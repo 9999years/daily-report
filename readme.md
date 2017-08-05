@@ -68,10 +68,12 @@ You will need *at least*:
 * [`uni2esky`][uni2esky], my own library for converting Unicode strings to Esky
   POS-58 escape sequences. Only necessary if you’d like to print on a receipt
   printer.
+* [`extendedformatter`][extformat], my library for formatting arbitrary strings
+  as `f`-strings.
 
 Which you can install with
 
-    pip install google-api-python-client python-twitter requests uni2esky
+    pip install google-api-python-client python-twitter requests uni2esky extendedformatter
 
 A larger barrier to entry will be the API keys:
 
@@ -134,4 +136,5 @@ to do a few things.
 [fmt-strings]: https://docs.python.org/3/library/string.html#format-string-syntax
 [iso8601]: https://en.m.wikipedia.org/wiki/ISO_8601
 [strftime]: https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
-[cust]: ./blob/master/customization.md
+[cust]: ./customization.md
+[extformat]: https://github.com/9999years/extendedformatter
