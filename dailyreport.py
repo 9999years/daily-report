@@ -6,8 +6,7 @@ import uni2esky
 
 # local imports
 import gen_credentials as creds
-from prefdicts import prefs, keys
-import prefhelpers
+from prefs import prefs, keys
 import misc
 from extendedformatter import formatter, extformat
 import weather
@@ -18,7 +17,8 @@ import maze
 
 def report():
     # refresh prefs
-    prefs, keys = prefhelpers.get_prefs()
+    prefs.refresh()
+    keys.refresh()
 
     # Tab /=\|\./l1r1r0l0
 

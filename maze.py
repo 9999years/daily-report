@@ -5,7 +5,7 @@
 # http://www.vidarholen.net/~vidar/generatemaze.py
 
 import random
-from prefdicts import prefs, keys
+from prefs import prefs, keys
 
 # so we can deal with directions with binary addition / subtraction
 # north and south = north + south or north | south yknow that kinda deal

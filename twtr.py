@@ -4,7 +4,7 @@ import dates
 import textwrap
 
 # local
-from prefdicts import prefs, keys
+from prefs import prefs, keys
 from extendedformatter import extformat
 import misc
 

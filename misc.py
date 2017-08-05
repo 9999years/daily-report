@@ -5,7 +5,7 @@ import subprocess
 import shlex
 
 # local
-from prefdicts import prefs, keys
+from prefs import prefs, keys
 
 def fill(txt, width=prefs['width'], **kwargs):
     return textwrap.fill(txt, **kwargs)

@@ -6,7 +6,7 @@ from collections import namedtuple
 import os
 from time import sleep
 
-from prefdicts import prefs, keys
+from prefs import prefs, keys
 import misc
 from extendedformatter import formatter, extformat
 

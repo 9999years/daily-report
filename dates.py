@@ -10,7 +10,7 @@ import textwrap
 # local
 import misc
 import gen_credentials as creds
-from prefdicts import prefs, keys
+from prefs import prefs, keys
 
 def timezone():
     delt = datetime.datetime.now() - datetime.datetime.utcnow()

@@ -4,8 +4,7 @@ import oauth2client as oauth
 import os
 
 # local
-from prefdicts import prefs, keys
-import prefhelpers
+from prefs import prefs, keys
 
 def credentials(prefs):
     """Gets valid user credentials from storage.
@@ -16,12 +15,12 @@ def credentials(prefs):
     Returns:
         Credentials, the obtained credential.
     """
-    cred_path = os.path.abspath(prefhelpers.fname('google_credential_path'))
+    cred_path = os.path.abspath(prefs.fname('google_credential_path'))
     store = oauth.file.Storage(cred_path)
     credentials = store.get()
     if not credentials or credentials.invalid:
         flow = oauth.client.flow_from_clientsecrets(
-            prefhelpers.fname('google_key_path'), prefs['calendar']['scope']
+            prefs.fname('google_key_path'), prefs['calendar']['scope']
         )
         flow.user_agent = prefs['app_name']
         credentials = oauth.tools.run_flow(flow, store, None)

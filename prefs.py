@@ -21,6 +21,8 @@ class JsonContainer(dict):
     def refresh(self):
         with open(self.path, encoding=self.encoding) as f:
             self.dict = json.loads(f.read())
+        if self.path is not None:
+            self.directory = path.abspath(path.dirname(self.path))
 
     def __getitem__(self, key):
         return self.dict.__getitem__(key)
@@ -34,26 +36,28 @@ class JsonContainer(dict):
         for method in methods:
             setattr(self, method, getattr(self.dict, method))
 
+    def fname(self, *route):
+        """
+        takes the route of a key in this that represents a filename relative
+        to the json source and returns the absolute filename.
+
+        route is passed as tuples
+        eg. if the key would be accessed as this['x']['y'], call
+        fname('x', 'y')
+        """
+        final = self.dict
+        for key in route:
+            final = final[key]
+        if not isinstance(final, str):
+            raise ValueError('Route did not lead to a string key in prefs')
+        else:
+            return path.join(self.directory, final)
+
+
 def json_from_file(fname, encoding='utf-8'):
     with open(fname, encoding=encoding) as f:
         return json.loads(f.read())
     return None
-
-def fname(*route):
-    """
-    takes the route of a key in prefs.json that represents a filename relative
-    to prefs.json and returns the absolute filename.
-
-    route is passed as tuples
-    eg. if the key would be accessed as prefs.prefs['x']['y'], call
-    fname('x', 'y')
-    """
-    for key in route:
-        final = prefs[key]
-    if not isinstance(final, str):
-        raise ValueError('Route did not lead to a string key in prefs')
-    else:
-        return path.join(prefs_dir, final)
 
 def get_prefs(pref_path=None, encoding='utf-8'):
     global prefs
@@ -79,7 +83,7 @@ def get_prefs(pref_path=None, encoding='utf-8'):
     # from keys
     prefs_dir = path.abspath(path.dirname(pref_path))
     prefs = JsonContainer(pref_path, encoding=encoding)
-    keys  = JsonContainer(fname('api_keys'), encoding=encoding)
+    keys  = JsonContainer(prefs.fname('api_keys'), encoding=encoding)
     return prefs, keys
 
 prefs, keys = get_prefs()
