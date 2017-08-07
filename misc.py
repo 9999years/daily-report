@@ -7,8 +7,10 @@ import shlex
 # local
 from prefs import prefs, keys
 
-def fill(txt, width=prefs['width'], **kwargs):
-    return textwrap.fill(txt, width=width, **kwargs)
+def fill(txt, width=prefs['width'], joiner='\n\n', **kwargs):
+    def fill_fn(msg):
+        return textwrap.fill(msg, width=width, **kwargs)
+    return joiner.join(map(fill_fn, txt.split('\n\n')))
 
 def left(txt, width=prefs['width'], fillchar=' '):
     return txt.ljust(width, fillchar)

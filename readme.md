@@ -81,7 +81,11 @@ A larger barrier to entry will be the API keys:
 
 * Stock module (hook up with Yahoo Finance?)
 * Output like Unix `cal(1)`
+* Gmail integration
 * ???
+* On this day in history
+* Breaking headlines
+* Birthdays
 
 # APIs
 

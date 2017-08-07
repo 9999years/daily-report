@@ -207,7 +207,7 @@ Definition: `twtr.last`
 
 Description: The last status from the given Twitter user
 
-Example output: `twtr.last('tiny_star_field')`
+Example output: `twitter('tiny_star_field')`
 
     @tiny_star_field: * 　 　　 ˚
     ✵        ·   .         · .  ·

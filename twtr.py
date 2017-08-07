@@ -26,7 +26,7 @@ def get_date(tweet):
     return datetime.datetime.strptime(tweet.created_at,
         '%a %b %d %H:%M:%S %z %Y')
 
-def format_tweet(tweet):
+def format_tweet(tweet, style=None):
     fvars = tweet.AsDict()
     fvars.update({
         'date': get_date(tweet),
@@ -36,7 +36,14 @@ def format_tweet(tweet):
             prefs['twitter']['pretty_format'],
             fvars, text=tweet.text.replace('\n', '\n\n')))
     })
-    return extformat(prefs['twitter']['format'], fvars)
+    if style == '__bot__':
+        # "pythonic"
+        fstr = prefs['twitter']['bot_format']
+    elif style is not None:
+        fstr = style
+    else:
+        fstr = prefs['twitter']['format']
+    return extformat(fstr, fvars)
 
 def since_yesterday(user='dril'):
     tweets = get_tweets(user)
@@ -50,9 +57,12 @@ def since_yesterday(user='dril'):
             continue
         date = get_date(tweet)
         if date > yesterday:
-            valid.append(format_tweet(tweet))
+            valid.append(tweet)
     return valid
 
-def last(user='dril'):
+def last(user='dril', style=None):
     tweets = since_yesterday(user)
-    return tweets[0] if len(tweets) > 0 else ''
+    return format_tweet(tweets[0], style=style) if len(tweets) > 0 else ''
+
+def bot(user='tiny_star_field'):
+    return last(user, style='__bot__')

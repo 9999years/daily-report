@@ -14,7 +14,8 @@
 		"{todo()}", "{thinhrule()}",
 		"{events()}", "{thinhrule()}",
 		"{countdown()}", "{hrule()}",
-		"{twitter('dril')}",
+		"{twitter('dril')}", "{hrule()}",
+		"{wikipedia()}",
 		"\n\n\n\n"
 	],
 	"google_key_path": "google_keys.json",
@@ -26,6 +27,7 @@
 	"horiz_light": "─",
 	"vert": "║",
 	"vert_light": "│",
+	"paragraph_joiner": "\n\n",
 	"weather": {
 		"location": "in/south_bend",
 		"height": 6,
@@ -73,9 +75,20 @@
 	"twitter": {
 		"pretty_format": "@{user['screen_name']}: {text}",
 		"format": [
-			"{pretty_text}", "{thinhrule()}",
+			"{pretty_text}",
+			"{thinhrule()}",
 			"{favorite_count} likes, {retweet_count} rts",
 			"{format(date, '%Y-%m-%d %I:%M:%S%p')}"
+		],
+		"bot_format": [
+			"@{user['screen_name']}", "{text}"
+		]
+	},
+	"wikipedia": {
+		"format": [
+			"{title}",
+			"{thinhrule()}",
+			"{fill(first)}"
 		]
 	}
 }
