@@ -8,6 +8,7 @@ import twtr
 import maze
 import weather
 import wikipedia
+import news
 
 # Tab /=\|\./l1r1r0l0
 
@@ -40,6 +41,7 @@ formatter.extend_env(
     sun             =   weather.suntimes,
     moon            =   weather.moon,
     wikipedia       = wikipedia.random,
+    news            =      news.headlines,
 
 )
 

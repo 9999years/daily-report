@@ -8,6 +8,8 @@ from prefs import prefs, keys
 from formatter import extformat
 import misc
 
+cache = {}
+
 def get_api():
     return twitter.Api(
         consumer_key=keys['twitter']['consumer_key'],
@@ -18,7 +20,9 @@ def get_api():
 
 def get_tweets(user='dril'):
     api = get_api()
-    return api.GetUserTimeline(screen_name=user)
+    if user not in cache:
+        cache[user] = api.GetUserTimeline(screen_name=user)
+    return cache[user]
 
 def get_date(tweet):
     """Tue Jul 18 03:44:48 +0000 2017

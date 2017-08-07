@@ -3,6 +3,7 @@ import datetime
 import re
 import subprocess
 import shlex
+import gen_credentials as creds
 
 # local
 from prefs import prefs, keys
@@ -117,3 +118,13 @@ def shell(prog, opts=[]):
     dispatch.extend(opts)
     result = subprocess.run(dispatch, stdout=subprocess.PIPE)
     return result.stdout.decode('utf-8')
+
+def shorten(url, **kwargs):
+    credentials, http, service = creds.build_creds('urlshortener', 'v1')
+    result = service.url().insert(body={
+        'longUrl': url }, **kwargs).execute()
+    return result['id']
+
+def shorten_pretty(url, **kwargs):
+    longer = shorten(url, **kwargs)
+    return longer[longer.index(':') + 3:]
