@@ -13,6 +13,8 @@ import gen_credentials as creds
 from prefs import prefs, keys
 from formatter import extformat
 
+cache = {}
+
 def timezone():
     delt = datetime.datetime.now() - datetime.datetime.utcnow()
     # round to the nearest second for some unix nonsense
@@ -46,7 +48,6 @@ def today_times(offset=0):
     return today, tomorrow
 
 def today_events(calendar='primary', day=0, **kwargs):
-    credentials, http, service = creds.build_creds()
     today, tomorrow = today_times(day)
 
     args = {
@@ -59,12 +60,26 @@ def today_events(calendar='primary', day=0, **kwargs):
 
     args.update(kwargs)
 
-    eventsResult = service.events().list(**args).execute()
+    # using a dict... as a dict key?
+    # pull requests are open if *you've* got something better
+    strargs = str(args)
+    if strargs in cache:
+        eventsResult = cache[strargs]
+    else:
+        credentials, http, service = creds.build_creds()
+        eventsResult = service.events().list(**args).execute()
+        cache[strargs] = eventsResult
+
     return eventsResult.get('items', [])
 
 def list_calendars():
-    credentials, http, service = creds.build_creds()
-    return service.calendarList().list().execute()['items']
+    if 'calendarList' in cache:
+        ret = cache['calendarList']
+    else:
+        credentials, http, service = creds.build_creds()
+        ret = service.calendarList().list().execute()
+        cache['calendarList'] = ret
+    return ret['items']
 
 def calendar_match(pat, regex=True):
     cals = list_calendars()

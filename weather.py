@@ -23,29 +23,19 @@ def api_url(endpoint):
 def weather(endpoint, retries=2):
     # already made this request? don't make it again!
     # TODO maybe add a time limit for cache validity
-    if endpoint in cache:
-        return cache[endpoint]
-
-    url = api_url(endpoint)
-
-    # request and retry up to `retries` times
-    for i in range(retries):
-        try:
+    if endpoint not in cache:
+        url = api_url(endpoint)
+        # request and retry up to `retries` times
+        for i in range(retries):
             r = requests.get(url)
-        except requests.exceptions.ConnectionError:
-            raise requests.exceptions.ConnectionError(
-                f'Connection to Wunderground endpoint {endpoint} failed.',
-                'This is an error with your network connection and',
-                'not Wundeground. Charging ahead as if nothing went wrong.')
-        if r.status_code == requests.codes.ok:
-            break
-        else:
-            # wait a second --- don't hammer the api
-            sleep(1)
+            if r.status_code == requests.codes.ok:
+                break
+            else:
+                # wait a second if we failed --- don't hammer the api
+                sleep(1)
 
-    ret = r.json()
-    cache[endpoint] = ret
-    return ret
+        cache[endpoint] = r.json()
+    return cache[endpoint]
 
 def graph():
     forecast = weather('hourly')

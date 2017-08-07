@@ -6,10 +6,16 @@ from prefs import prefs
 import misc
 from formatter import extformat
 
+cache = {}
+
+def wiki_parser(url):
+    if url not in cache:
+        article = requests.get(url)
+        cache['url'] = BeautifulSoup(article.text, 'html.parser')
+    return cache['url']
+
 def random_parser():
-    article = requests.get('https://en.m.wikipedia.org/wiki/Special:Random#/random')
-    soup = BeautifulSoup(article.text, 'html.parser')
-    return soup
+    return wiki_parser('https://en.m.wikipedia.org/wiki/Special:Random#/random')
 
 def random():
     soup = random_parser()

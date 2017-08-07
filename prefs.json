@@ -14,12 +14,19 @@
 		"{todo()}", "{thinhrule()}",
 		"{events()}", "{thinhrule()}",
 		"{countdown()}", "{hrule()}",
+		"{news()}", "{hrule()}",
 		"{twitter('dril')}", "{hrule()}",
 		"{wikipedia()}",
 		"\n\n\n\n"
 	],
-	"google_key_path": "google_keys.json",
-	"google_credential_path": "google_credentials.json",
+	"google": {
+		"scopes": [
+			"https://www.googleapis.com/auth/calendar.readonly",
+			"https://www.googleapis.com/auth/urlshortener"
+		],
+		"client_secret_path": "google_client_secrets.json",
+		"credential_path": "google_credentials.json"
+	},
 	"app_name": "the daily report",
 	"api_keys": "keys.json",
 	"width": 32,
@@ -58,7 +65,6 @@
 		"ending": "→{time}"
 	},
 	"calendar": {
-		"scope": "https://www.googleapis.com/auth/calendar.readonly",
 		"todo_pat": "to.?do",
 		"countdown_pat": "count.?downs?",
 		"work_pat": ".*work.*",
@@ -86,12 +92,14 @@
 	},
 	"wikipedia": {
 		"format": [
-			"{title}",
+			"{fill(title)}",
 			"{thinhrule()}",
 			"{fill(first)}"
 		]
 	},
 	"news": {
-		"format": "{title}\n{thinhrule()}"
+		"format": [
+			"{fill(f\"{title} ⟨{short_url}⟩\")}"
+		]
 	}
 }
