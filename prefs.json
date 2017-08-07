@@ -90,5 +90,8 @@
 			"{thinhrule()}",
 			"{fill(first)}"
 		]
+	},
+	"news": {
+		"format": "{title}\n{thinhrule()}"
 	}
 }
