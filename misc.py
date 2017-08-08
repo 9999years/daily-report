@@ -3,15 +3,17 @@ import datetime
 import re
 import subprocess
 import shlex
+import requests
+
 import gen_credentials as creds
 
 # local
 from prefs import prefs, keys
 
-def fill(txt, width=prefs['width'], joiner='\n\n', **kwargs):
+def fill(*txt, width=prefs['width'], joiner='\n\n', **kwargs):
     def fill_fn(msg):
         return textwrap.fill(msg, width=width, **kwargs)
-    return joiner.join(map(fill_fn, txt.split('\n\n')))
+    return joiner.join(map(fill_fn, ''.join(txt).split(joiner)))
 
 def left(txt, width=prefs['width'], fillchar=' '):
     return txt.ljust(width, fillchar)
@@ -41,7 +43,7 @@ def scale(val, min, max, omin, omax):
     return (val - min) / (max - min) * (omax - omin) + omin
 
 def format_left(txt, leader='',
-        firstline=None, align_leader='right', margin='firstline'):
+        firstline=None, align_leader='right', margin='firstline', splitter='\n'):
     firstline = firstline or leader
     margin = len(firstline)
     leader = leader.rjust(margin) if align_leader == 'right' else leader
@@ -50,7 +52,7 @@ def format_left(txt, leader='',
     out = f'{firstline}{lines.pop(0)}\n'
     for line in lines:
         out += (f'{leader}{line}\n')
-    return out
+    return out.rstrip()
 
 def center(txt, width=prefs['width'], fillchar=' '):
     return txt.center(width, fillchar)
@@ -128,3 +130,19 @@ def shorten(url, **kwargs):
 def shorten_pretty(url, **kwargs):
     longer = shorten(url, **kwargs)
     return longer[longer.index(':') + 3:]
+
+def request_json(url, cache):
+    # already made this request? don't make it again!
+    # TODO maybe add a time limit for cache validity
+    if url not in cache:
+        # request and retry up to `retries` times
+        for i in range(prefs['max_retries']):
+            r = requests.get(url)
+            if r.status_code == requests.codes.ok:
+                break
+            else:
+                # wait a second if we failed --- don't hammer the api
+                sleep(1)
+
+        cache[url] = r.json()
+    return cache[url], cache

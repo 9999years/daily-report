@@ -14,9 +14,12 @@
 		"{todo()}", "{thinhrule()}",
 		"{events()}", "{thinhrule()}",
 		"{countdown()}", "{hrule()}",
-		"{news()}", "{hrule()}",
+		"{headlines(news.nytimes('World'))}",
+		"{headline(reuters('technologynews'))}",
+		"{hrule()}",
 		"{twitter('dril')}", "{hrule()}",
-		"{wikipedia()}",
+		"{wikipedia()}", "{hrule()}",
+		"{stocks()}",
 		"\n\n\n\n"
 	],
 	"google": {
@@ -35,6 +38,7 @@
 	"vert": "║",
 	"vert_light": "│",
 	"paragraph_joiner": "\n\n",
+	"max_retries": 3,
 	"weather": {
 		"location": "in/south_bend",
 		"height": 6,
@@ -43,7 +47,6 @@
 			"temp":   "×",
 			"both":   "¤"
 		},
-		"max_retries": 3,
 		"forecast_format": "{low}-{high}°F, {precip}%p",
 		"moon": {
 			"bright_graphic": "○",
@@ -99,7 +102,17 @@
 	},
 	"news": {
 		"format": [
-			"{fill(f\"{title} ⟨{short_url}⟩\")}"
+			"{format_left(f'{title} ⟨{short_url}⟩', firstline='→ ')}"
 		]
+	},
+	"stocks": {
+		"format": [
+			"{align(Symbol, f'{PercentChange}', f'{LastTradePriceOnly}{Currency}')}"
+		],
+		"symbols": [
+			"^GSPC", "^VIX", "AMZN", "GOLD", "GDX", "MSFT",
+			"RDS-A", "FB", "GOOGL", "TWTR", "AAPL", "TSLA"
+		],
+		"exclude_currencies": ["USD"]
 	}
 }

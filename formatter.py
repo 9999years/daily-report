@@ -14,6 +14,12 @@ import news
 
 formatter.extend_env(
 
+    misc      = misc,
+    dates     = dates,
+    twtr      = twtr,
+    weather   = weather,
+    news      = news,
+
     hrule           =      misc.hrule,
     thinhrule       =      misc.thinhrule,
     center          =      misc.center,
@@ -21,6 +27,7 @@ formatter.extend_env(
     left_pad        =      misc.right,
     align           =      misc.align,
     fill            =      misc.fill,
+    format_left     =      misc.format_left,
     hm              =      misc.hoursminutes,
     shell           =      misc.shell,
     today           =     dates.today_date,
@@ -41,7 +48,9 @@ formatter.extend_env(
     sun             =   weather.suntimes,
     moon            =   weather.moon,
     wikipedia       = wikipedia.random,
-    news            =      news.headlines,
+    headlines       =      news.headlines,
+    headline        =      news.headline,
+    stocks          =    stocks.stocks,
 
 )
 

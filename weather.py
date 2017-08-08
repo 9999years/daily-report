@@ -20,22 +20,10 @@ def api_url(endpoint):
         + endpoint
         + '/q/{location}.json'.format_map(prefs['weather']))
 
-def weather(endpoint, retries=2):
-    # already made this request? don't make it again!
-    # TODO maybe add a time limit for cache validity
-    if endpoint not in cache:
-        url = api_url(endpoint)
-        # request and retry up to `retries` times
-        for i in range(retries):
-            r = requests.get(url)
-            if r.status_code == requests.codes.ok:
-                break
-            else:
-                # wait a second if we failed --- don't hammer the api
-                sleep(1)
-
-        cache[endpoint] = r.json()
-    return cache[endpoint]
+def weather(endpoint):
+    global cache
+    ret, cache = misc.request_json(api_url(endpoint), cache)
+    return ret
 
 def graph():
     forecast = weather('hourly')
