@@ -5,29 +5,24 @@ from urllib import parse as urlparse
 from collections import namedtuple
 import os
 
-import prefs
+from prefs import prefs, keys
 import misc
+from formatter import extformat
+
+# dict of runtime caches, to avoid double requests
+cache = {}
 
 def api_url(endpoint):
     return ('https://api.wunderground.com/api/'
-        + prefs.keys['wunderground']
+        + keys['wunderground']
         + '/'
         + endpoint
-        + '/q/{state}/{city}.json'.format_map(prefs.prefs['location']))
+        + '/q/{location}.json'.format_map(prefs['weather']))
 
-def weather(endpoint, retries=2):
-    url = api_url(endpoint)
-
-    # request and retry up to `retries` times
-    for i in range(retries):
-        r = requests.get(url)
-        if r.status_code == requests.codes.ok:
-            break
-        else:
-            # wait a second --- don't hammer the api
-            sleep(1)
-
-    return r.json()
+def weather(endpoint):
+    global cache
+    ret, cache = misc.request_json(api_url(endpoint), cache)
+    return ret
 
 def graph():
     forecast = weather('hourly')
@@ -64,35 +59,50 @@ def graph():
         elif align is 'right':
             field[y] = field[y][0:x - len(val)] + val + field[y][x:]
 
-    width = prefs.prefs['width']
-    height = prefs.prefs['weather']['height']
+    width = prefs['width']
+    height = prefs['weather']['height']
     margin = 3
     step = int((width - 2 * margin) / len(moments))
-    time_rows = 3 * step
+    time_rows = 1
+    # time_rows = 3 * step
 
     graph = [' ' * width for x in range(height + time_rows)]
 
+    chars = prefs['weather']['chars']
+
+    place('°F' + chars['temp'], 0, height)
+    place(chars['precip'] + '%p', width - margin, height)
+
     for y in range(height):
+        # temp axis marker
         place(str(int(misc.lerp(temp_min, temp_max, y / (height - 1)))),
             0, y)
 
-        place(prefs.prefs['vert'], margin - 1, y)
+        # left rule
+        place(prefs['vert'], margin - 1, y)
 
+        # precip marker
         place(str(int(misc.lerp(precip_min, precip_max, y / (height - 1)))),
             width, y, align='right')
 
-        place(prefs.prefs['vert'], width - margin, y)
-
-    chars = prefs.prefs['weather']['chars']
+        # right rule
+        place(prefs['vert'], width - margin, y)
 
     for i, moment in enumerate(moments):
-        odd = i % time_rows
+        # odd = i % time_rows
         i_orig = i
         i = int(i * step + margin)
-        time_num = moment.time[:-2]
-        if int(time_num) % 12 == 0:
-            for j in range(height):
-                place(prefs.prefs['vert_light'], i, j)
+        time_num = int(moment.time[:-2])
+
+        if time_num % 3 == 0:
+            # write time at 3 6 9 12
+            place(str(time_num), i, height)
+
+            # vrule at 12am/pm
+            if time_num % 12 == 0:
+                for j in range(height):
+                    place(prefs['vert_light'], i, j)
+
         temp_y = int(misc.scale(
             moment.temp, temp_min, temp_max, 0, height - 1))
         place(chars['temp'], i, temp_y)
@@ -103,20 +113,86 @@ def graph():
         else:
             place(chars['precip'], i, precip_y)
 
-        place(time_num, i, height + odd)
 
     return '\n'.join(graph)
 
-def forecast():
+def day_forecast(day=0):
     forecast = weather('forecast')['forecast']
-    day_data = forecast['simpleforecast']['forecastday'][0]
-    txt_data = forecast['txt_forecast']['forecastday'][0]
-    high     = int(day_data['high']['fahrenheit'])
-    low      = int(day_data['low']['fahrenheit'])
-    precip   = int(day_data['pop'])
-    conds    = day_data['conditions'].lower()
-    summary  = txt_data['fcttext']
-    return f'{low}-{high}°F, {precip}% chance of precip.\n{conds}'
+    day_data = forecast['simpleforecast']['forecastday'][day]
+    txt_data = forecast['txt_forecast']['forecastday'][day]
+
+    return extformat(prefs['weather']['forecast_format'],
+        forecast=forecast,
+        day_data=day_data,
+        txt_data=txt_data,
+        high    =int(day_data['high'][prefs['weather']['temp']]),
+        low     =int(day_data['low'][prefs['weather']['temp']]),
+        precip  =int(day_data['pop']),
+        conds   =day_data['conditions'],
+        summary =txt_data['fcttext'],
+    )
+
+def conditions(day=0):
+    return (weather('forecast')
+        ['forecast']
+        ['simpleforecast']
+        ['forecastday']
+        [day]
+        ['conditions'])
+
+def tomorrow_conditions():
+    return conditions(day=1)
+
+def today_forecast(day=0):
+    return day_forecast(day=day)
+
+def tomorrow_forecast(day=1):
+    return day_forecast(day=day)
+
+def parsesuntime(t):
+    return datetime.datetime.strptime(
+        t['hour'].rjust(2, '0') + t['minute'], '%H%M')
+
+def sunrise():
+    times = weather('astronomy')['sun_phase']['sunrise']
+    return parsesuntime(times)
+
+def sunset():
+    times = weather('astronomy')['sun_phase']['sunset']
+    return parsesuntime(times)
+
+def suntimes():
+    risetime, settime = sunrise(), sunset()
+    daylight = settime - risetime
+
+    risefmt = extformat(
+        prefs['weather']['sun']['rise_format'],
+        sunrise=misc.hoursminutes(risetime, fillchar=''))
+
+    setfmt = extformat(
+        prefs['weather']['sun']['set_format'],
+        sunset=misc.hoursminutes(settime, fillchar=''))
+
+    dayfmt = extformat(
+        prefs['weather']['sun']['daylight_format'],
+        daylight=misc.formatdelta(daylight))
+
+    return extformat(
+        prefs['weather']['sun']['format'],
+        sunrise =risefmt,
+        sunset  =setfmt,
+        daylight=dayfmt,)
+
+def moon():
+    times = weather('astronomy')['moon_phase']
+    phase = times['phaseofMoon'].lower()
+    percent = times['percentIlluminated']
+    graphic = (prefs['weather']['moon']['bright_graphic']
+        if int(times['percentIlluminated']) > 50
+        else prefs['weather']['moon']['dark_graphic'])
+
+    return extformat(prefs['weather']['moon']['format'],
+        **locals())
 
 def main():
     forecast()
