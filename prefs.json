@@ -112,9 +112,9 @@
 		],
 		"source": "yahoo",
 		"symbols": [
-			{ "symbol": "^GSPC", "display_symbol": "S&P500"},
+			{ "symbol": "^GSPC", "display_symbol": "S&P 500"},
 			{ "symbol": ".DJI", "display_symbol": "Dow Jones"},
-			{ "symbol": "^VIX", "display_symbol": "Volatility"},
+			{ "symbol": "^VIX", "display_symbol": "VIX"},
 			{ "symbol": "GOLD", "format":
 			"{default()}\n{thinhrule()}" }, "AMZN", "GDX",
 			"MSFT", "RDS-A", "FB", "GOOGL", "TWTR", "AAPL",

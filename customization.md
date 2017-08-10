@@ -43,7 +43,7 @@ Okay, that’s a bit of a lie; a few functions, like `center()`, require an
 argument; usually, this will be clear. If this is the case, optional arguments
 *are* written in brackets.
 
-## Global Format Variables
+## Global Format Functions
 
 These format variables are available in *all* format strings, whereas local
 format variables are only available in some; `sun` can be used in any format
@@ -315,6 +315,13 @@ Description: Shows moon phase and illumination percent, formatted according to
 Example output:
 
          ○ first quarter @ 53%
+
+### `headlines(url=news.reuters('worldnews'), amount=3)`
+
+Definition: `news.headlines`
+
+Description: 3 (or more!) headlines from the RSS feed of your choice. Just a
+generic RSS parser, so feel free to plug whatever you'd like into it!
 
 ## Local Format Variables
 
