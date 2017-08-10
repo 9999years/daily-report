@@ -4,7 +4,6 @@ import requests
 from urllib import parse as urlparse
 from collections import namedtuple
 import os
-from time import sleep
 
 import prefs
 import misc

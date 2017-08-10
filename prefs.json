@@ -1,5 +1,6 @@
 {
 	"format": [
+<<<<<<< Updated upstream
 		"good morning!",
 		"{today}",
 		"{iso_date}",
@@ -14,6 +15,51 @@
 		"{hrule}",
 		"{countdown}",
 		"\n\n\n"
+||||||| merged common ancestors
+		"{'good morning!'!c}",
+		"{today()!lc}",
+		"{align(left=now_hm(), right=iso_date())}", "{hrule()}",
+		"{forecast()!c}",
+		"{conditions()!lc}",
+		"{sun()}",
+		"{moon()!c}", "{thinhrule()}",
+		"{'tomorrow: ' + tmrw_forecast()!c}",
+		"{tmrw_conditions()!lc}", "{hrule()}",
+		"{weather_graph()}", "{hrule()}",
+		"{work()}", "{thinhrule()}",
+		"{todo()}", "{thinhrule()}",
+		"{events()}", "{thinhrule()}",
+		"{countdown()}", "{hrule()}",
+		"{headlines(news.nytimes('World'))}",
+		"{headline(reuters('technologynews'))}",
+		"{hrule()}",
+		"{twitter('dril')}", "{hrule()}",
+		"{wikipedia()}", "{hrule()}",
+		"{stocks()}",
+		"\n\n\n\n"
+=======
+		"{'good morning!'!c}",
+		"{today()!lc}",
+		"{align(left=now_hm(), right=iso_date())}", "{hrule()}",
+		"{forecast()!c}",
+		"{conditions()!lc}",
+		"{sun()}",
+		"{moon()!c}", "{thinhrule()}",
+		"{'tomorrow: ' + tmrw_forecast()!c}",
+		"{tmrw_conditions()!lc}", "{hrule()}",
+		"{weather_graph()}", "{hrule()}",
+		"{work()}", "{thinhrule()}",
+		"{todo()}", "{thinhrule()}",
+		"{events()}", "{thinhrule()}",
+		"{countdown()}", "{hrule()}",
+		"{headlines(news.nytimes('World'))}",
+		"{headline(news.reuters('technologynews'))}",
+		"{hrule()}",
+		"{twitter('dril')}", "{hrule()}",
+		"{wikipedia()}", "{hrule()}",
+		"{stocks()}",
+		"\n\n\n\n"
+>>>>>>> Stashed changes
 	],
 	"location": {
 		"state": "va",
@@ -42,5 +88,93 @@
 		"countdown_pat": "count.?downs?",
 		"todo_check": "[] ",
 		"max_countdowns": 10
+<<<<<<< Updated upstream
+||||||| merged common ancestors
+	},
+	"maze": {
+		"height": 10,
+		"style": "random",
+		"halves": false,
+		"start": "S",
+		"end": "E"
+	},
+	"twitter": {
+		"pretty_format": "@{user['screen_name']}: {text}",
+		"format": [
+			"{pretty_text}",
+			"{thinhrule()}",
+			"{favorite_count} likes, {retweet_count} rts",
+			"{format(date, '%Y-%m-%d %I:%M:%S%p')}"
+		],
+		"bot_format": [
+			"@{user['screen_name']}", "{text}"
+		]
+	},
+	"wikipedia": {
+		"format": [
+			"{fill(title)}",
+			"{thinhrule()}",
+			"{fill(first)}"
+		]
+	},
+	"news": {
+		"format": [
+			"{format_left(f'{title} ⟨{short_url}⟩', firstline='→ ')}"
+		]
+	},
+	"stocks": {
+		"format": [
+			"{align(Symbol, f'{PercentChange}', f'{LastTradePriceOnly}{Currency}')}"
+		],
+		"symbols": [
+			"^GSPC", "^VIX", "AMZN", "GOLD", "GDX", "MSFT",
+			"RDS-A", "FB", "GOOGL", "TWTR", "AAPL", "TSLA"
+		],
+		"exclude_currencies": ["USD"]
+=======
+	},
+	"maze": {
+		"height": 10,
+		"style": "random",
+		"halves": false,
+		"start": "S",
+		"end": "E"
+	},
+	"twitter": {
+		"pretty_format": "@{user['screen_name']}: {text}",
+		"format": [
+			"{pretty_text}",
+			"{thinhrule()}",
+			"{favorite_count} likes, {retweet_count} rts",
+			"{format(date, '%Y-%m-%d %I:%M:%S%p')}"
+		],
+		"bot_format": [
+			"@{user['screen_name']}", "{text}"
+		]
+	},
+	"wikipedia": {
+		"format": [
+			"{fill(title)}",
+			"{thinhrule()}",
+			"{fill(first)}"
+		]
+	},
+	"news": {
+		"format": [
+			"{format_left(f'{title} ⟨{short_url}⟩', firstline='→ ').rstrip()}"
+		]
+	},
+	"stocks": {
+		"format": [
+			"{align(Symbol, f'{PercentChange}'.ljust(8),",
+			"f'{LastTradePriceOnly}{Currency}')}"
+		],
+		"symbols": [
+			"^GSPC", ".DJI", "^VIX", { "symbol": "GOLD", "format": "{default}\n{thinhrule()}" },
+			"AMZN", "GDX", "MSFT", "RDS-A", "FB", "GOOGL",
+			"TWTR", "AAPL", "TSLA"
+		],
+		"excluded_currencies": ["USD"]
+>>>>>>> Stashed changes
 	}
 }

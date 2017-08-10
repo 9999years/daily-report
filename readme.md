@@ -60,10 +60,31 @@ You will need *at least*:
 * `google-api-python-client`
 * `python-twitter`
 * `requests`
+<<<<<<< Updated upstream
+||||||| merged common ancestors
+* [`uni2esky`][uni2esky], my own library for converting Unicode strings to Esky
+  POS-58 escape sequences. Only necessary if you’d like to print on a receipt
+  printer.
+* [`extendedformatter`][extformat], my library for formatting arbitrary strings
+  as `f`-strings.
+=======
+* [`uni2esky`][uni2esky], my own library for converting Unicode strings to Esky
+  POS-58 escape sequences. Only necessary if you’d like to print on a receipt
+  printer.
+* [`extendedformatter`][extformat], my library for formatting arbitrary strings
+  as `f`-strings.
+* `BeautifulSoup4`
+>>>>>>> Stashed changes
 
 Which you can install with
 
+<<<<<<< Updated upstream
     pip install google-api-python-client python-twitter requests
+||||||| merged common ancestors
+    pip install google-api-python-client python-twitter requests uni2esky extendedformatter
+=======
+    pip install google-api-python-client python-twitter requests uni2esky extendedformatter beautifulsoup4
+>>>>>>> Stashed changes
 
 A larger barrier to entry will be the API keys:
 
