@@ -5,50 +5,55 @@
 The Daily Report is a script to output a daily briefing — I’m hooking it up
 to a cron job and a receipt printer to print out an agenda for me daily.
 
-Run `gen_credentials.py` to generate a credential file.
-
 Usage:
 
     $ ./dailyreport.py
 
-    good morning!
-    today is wednesday, july 19
-                          2017-07-19
-    --------------------------------
-    72-91°F, 20% chance of precip.
-    partly cloudy
-    --------------------------------
-    94|øø····             ×××××××|15
-    89|  ××             ××       |12
-    85|    ×           ×         | 9
-    81|     ×××·······×          | 6
-    77|      ··××××  ×··         | 3
-    73|            ××   ·········| 0
-       6  9  12 3  6  9  12 3  6
-        7  10 1  4  7  10 1  4  7
-         8  11 2  5  8  11 2  5
-    --------------------------------
-    all day | parents gone (day 13
-            | of 16)
-    --------------------------------
-     8:00PM | egg drop soup w
-            | camille (& possibly
-            | aya)
-    --------------------------------
-    [] send immunization records
-    --------------------------------
-     16 | visit jay (2017-08-04)
-     39 | move in day (2017-08-27)
-    159 | christmas (2017-12-25)
-    285 | birthday (2018-04-30)
+             good morning!
+    today is sunday, july 30
+    7:43PM                2017-07-30
+    ════════════════════════════════
+             60-82°F, 10%p
+                 clear
+    6:08AM ↑      14:14     8:22PM ↓
+         ○ first quarter @ 53%
+    ────────────────────────────────
+    tomorrow: 65-85°F, 10%p
+                 clear
+    ════════════════════════════════
+    84║   │    ···    │××××××××  ║ 8
+    79║×  │  ··   ·  ××        ××║ 6
+    74║ × │ ·      ·× │          ║ 4
+    70║  ××¤×      ×· │         ·║ 3
+    65║   │  ×××× ×   │        · ║ 1
+    61║····      ×   ··········  ║ 0
+    °F×9  12 3  6  9  12 3  6  9 ·%p
+    ════════════════════════════════
+    all day ║ summer break (day 43
+            ║ of 60)
+    ────────────────────────────────
+    12:00PM ║ work at citysburg
+    ────────────────────────────────
+    [] get toothpaste
+    ────────────────────────────────
+      5 ║ visit jay (2017-08-04)
+     28 ║ move in day (2017-08-27)
+    148 ║ christmas (2017-12-25)
+    274 ║ birthday (2018-04-30)
 
 
-
-Make sure to edit `prefs.json` for accurate weather forecasts.
+Make sure to read/edit `prefs.json`! It controls **all** of the program's
+behavior, from weather location to output format. It is dense by design — I
+believe you should be able to completely change the output format to suit you
+without touching the code. Easy modifications for me are an advantage.
 
 Potential usage with `cron`, to print daily at 6am:
 
     0 6 * * * cd /home/pi/daily-report && git pull && ./dailyreport.py | lpr -l
+
+# Customization
+
+See [`customization.md`][cust] for details on how to customize The Daily Report.
 
 # Dependencies
 
@@ -60,33 +65,28 @@ You will need *at least*:
 * `google-api-python-client`
 * `python-twitter`
 * `requests`
-<<<<<<< Updated upstream
-||||||| merged common ancestors
-* [`uni2esky`][uni2esky], my own library for converting Unicode strings to Esky
-  POS-58 escape sequences. Only necessary if you’d like to print on a receipt
-  printer.
-* [`extendedformatter`][extformat], my library for formatting arbitrary strings
-  as `f`-strings.
-=======
 * [`uni2esky`][uni2esky], my own library for converting Unicode strings to Esky
   POS-58 escape sequences. Only necessary if you’d like to print on a receipt
   printer.
 * [`extendedformatter`][extformat], my library for formatting arbitrary strings
   as `f`-strings.
 * `BeautifulSoup4`
->>>>>>> Stashed changes
 
 Which you can install with
 
-<<<<<<< Updated upstream
-    pip install google-api-python-client python-twitter requests
-||||||| merged common ancestors
-    pip install google-api-python-client python-twitter requests uni2esky extendedformatter
-=======
     pip install google-api-python-client python-twitter requests uni2esky extendedformatter beautifulsoup4
->>>>>>> Stashed changes
 
 A larger barrier to entry will be the API keys:
+
+# Functionality coming soon, maybe
+
+* Stock module (hook up with Yahoo Finance?)
+* Output like Unix `cal(1)`
+* Gmail integration
+* ???
+* On this day in history
+* Breaking headlines
+* Birthdays
 
 # APIs
 
@@ -114,7 +114,7 @@ Twitter      |A Lot
 
 ## Google
 
-Ah, Google. The blue beast. Anyways, to get some Google credentials you'll need
+Ah, Google. The Blue Beast. Anyways, to get some Google credentials you'll need
 to do a few things.
 
 1. [Create a project][proj] in the Google Cloud Platform. There's a quota of
@@ -130,10 +130,16 @@ to do a few things.
    `prefs.json` is.
 4. Run `gen_credentials.py`, which will open your default browser, prompting
    you to log in. This generates the second set of OAuth keys, stored in
-   `google_credentials.json` (`prefs.google_credential_path`).
+   `google_credentials.json` (`prefs.google_credential_path`). You’re done!
 
 [wunderground]: https://www.wunderground.com/weather/api
 [twitter]: https://apps.twitter.com/app/new
 [gcal]: https://console.cloud.google.com/apis/dashboard
 [creds]: https://console.cloud.google.com/apis/credentials
 [proj]: https://console.cloud.google.com/projectcreate
+[uni2esky]: https://pypi.python.org/pypi/uni2esky
+[fmt-strings]: https://docs.python.org/3/library/string.html#format-string-syntax
+[iso8601]: https://en.m.wikipedia.org/wiki/ISO_8601
+[strftime]: https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
+[cust]: ./customization.md
+[extformat]: https://github.com/9999years/extendedformatter

@@ -1,43 +1,5 @@
 {
 	"format": [
-<<<<<<< Updated upstream
-		"good morning!",
-		"{today}",
-		"{iso_date}",
-		"{hrule}",
-		"{short_forecast}",
-		"{hrule}",
-		"{weather_graph}",
-		"{hrule}",
-		"{calendar}",
-		"{hrule}",
-		"{todo}",
-		"{hrule}",
-		"{countdown}",
-		"\n\n\n"
-||||||| merged common ancestors
-		"{'good morning!'!c}",
-		"{today()!lc}",
-		"{align(left=now_hm(), right=iso_date())}", "{hrule()}",
-		"{forecast()!c}",
-		"{conditions()!lc}",
-		"{sun()}",
-		"{moon()!c}", "{thinhrule()}",
-		"{'tomorrow: ' + tmrw_forecast()!c}",
-		"{tmrw_conditions()!lc}", "{hrule()}",
-		"{weather_graph()}", "{hrule()}",
-		"{work()}", "{thinhrule()}",
-		"{todo()}", "{thinhrule()}",
-		"{events()}", "{thinhrule()}",
-		"{countdown()}", "{hrule()}",
-		"{headlines(news.nytimes('World'))}",
-		"{headline(reuters('technologynews'))}",
-		"{hrule()}",
-		"{twitter('dril')}", "{hrule()}",
-		"{wikipedia()}", "{hrule()}",
-		"{stocks()}",
-		"\n\n\n\n"
-=======
 		"{'good morning!'!c}",
 		"{today()!lc}",
 		"{align(left=now_hm(), right=iso_date())}", "{hrule()}",
@@ -59,79 +21,58 @@
 		"{wikipedia()}", "{hrule()}",
 		"{stocks()}",
 		"\n\n\n\n"
->>>>>>> Stashed changes
 	],
-	"location": {
-		"state": "va",
-		"city": "reston"
+	"google": {
+		"scopes": [
+			"https://www.googleapis.com/auth/calendar.readonly",
+			"https://www.googleapis.com/auth/urlshortener"
+		],
+		"client_secret_path": "google_client_secrets.json",
+		"credential_path": "google_credentials.json"
 	},
-	"google_key_path": "google_keys.json",
-	"google_credential_path": "google_credentials.json",
 	"app_name": "the daily report",
 	"api_keys": "keys.json",
 	"width": 32,
-	"horiz": "-",
-	"horiz_light": "·",
-	"vert": "|",
-	"vert_light": "|",
+	"horiz": "═",
+	"horiz_light": "─",
+	"vert": "║",
+	"vert_light": "│",
+	"paragraph_joiner": "\n\n",
+	"max_retries": 3,
 	"weather": {
+		"location": "in/south_bend",
 		"height": 6,
 		"chars": {
 			"precip": "·",
-			"temp": "×",
-			"both": "ø"
-		}
+			"temp":   "×",
+			"both":   "¤"
+		},
+		"forecast_format": "{low}-{high}°F, {precip}%p",
+		"moon": {
+			"bright_graphic": "○",
+			"dark_graphic": "●",
+			"format": "{graphic} {phase} @ {percent}%"
+		},
+		"sun": {
+			"rise_format": "{sunrise} ↑",
+			"set_format": "{sunset} ↓",
+			"daylight_format": "{daylight}",
+			"format": "{align(sunrise, daylight, sunset)}"
+		},
+		"temp": "fahrenheit"
+	},
+	"dates": {
+		"today_format": "today is %A, %b %d",
+		"hours": 12,
+		"all_day": "all day",
+		"ending": "→{time}"
 	},
 	"calendar": {
-		"scope": "https://www.googleapis.com/auth/calendar.readonly",
 		"todo_pat": "to.?do",
 		"countdown_pat": "count.?downs?",
+		"work_pat": ".*work.*",
 		"todo_check": "[] ",
 		"max_countdowns": 10
-<<<<<<< Updated upstream
-||||||| merged common ancestors
-	},
-	"maze": {
-		"height": 10,
-		"style": "random",
-		"halves": false,
-		"start": "S",
-		"end": "E"
-	},
-	"twitter": {
-		"pretty_format": "@{user['screen_name']}: {text}",
-		"format": [
-			"{pretty_text}",
-			"{thinhrule()}",
-			"{favorite_count} likes, {retweet_count} rts",
-			"{format(date, '%Y-%m-%d %I:%M:%S%p')}"
-		],
-		"bot_format": [
-			"@{user['screen_name']}", "{text}"
-		]
-	},
-	"wikipedia": {
-		"format": [
-			"{fill(title)}",
-			"{thinhrule()}",
-			"{fill(first)}"
-		]
-	},
-	"news": {
-		"format": [
-			"{format_left(f'{title} ⟨{short_url}⟩', firstline='→ ')}"
-		]
-	},
-	"stocks": {
-		"format": [
-			"{align(Symbol, f'{PercentChange}', f'{LastTradePriceOnly}{Currency}')}"
-		],
-		"symbols": [
-			"^GSPC", "^VIX", "AMZN", "GOLD", "GDX", "MSFT",
-			"RDS-A", "FB", "GOOGL", "TWTR", "AAPL", "TSLA"
-		],
-		"exclude_currencies": ["USD"]
-=======
 	},
 	"maze": {
 		"height": 10,
@@ -175,6 +116,5 @@
 			"TWTR", "AAPL", "TSLA"
 		],
 		"excluded_currencies": ["USD"]
->>>>>>> Stashed changes
 	}
 }
