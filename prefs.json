@@ -15,7 +15,7 @@
 		"{events()}", "{thinhrule()}",
 		"{countdown()}", "{hrule()}",
 		"{headlines(news.nytimes('World'))}",
-		"{headline(reuters('technologynews'))}",
+		"{headline(news.reuters('technologynews'))}",
 		"{hrule()}",
 		"{twitter('dril')}", "{hrule()}",
 		"{wikipedia()}", "{hrule()}",
@@ -102,17 +102,24 @@
 	},
 	"news": {
 		"format": [
-			"{format_left(f'{title} ⟨{short_url}⟩', firstline='→ ')}"
+			"{format_left(f'{title} ⟨{short_url}⟩', firstline='→ ').rstrip()}"
 		]
 	},
 	"stocks": {
 		"format": [
-			"{align(Symbol, f'{PercentChange}', f'{LastTradePriceOnly}{Currency}')}"
+			"{align(Symbol, f'{PercentChange}'.ljust(8),",
+			"f'{LastTradePriceOnly}{Currency}')}"
 		],
+		"source": "yahoo",
 		"symbols": [
-			"^GSPC", "^VIX", "AMZN", "GOLD", "GDX", "MSFT",
-			"RDS-A", "FB", "GOOGL", "TWTR", "AAPL", "TSLA"
+			{ "symbol": "^GSPC", "display_symbol": "S&P 500"},
+			{ "symbol": ".DJI", "display_symbol": "Dow Jones"},
+			{ "symbol": "^VIX", "display_symbol": "VIX"},
+			{ "symbol": "GOLD", "format":
+			"{default()}\n{thinhrule()}" }, "AMZN", "GDX",
+			"MSFT", "RDS-A", "FB", "GOOGL", "TWTR", "AAPL",
+			"TSLA"
 		],
-		"exclude_currencies": ["USD"]
+		"excluded_currencies": ["USD"]
 	}
 }

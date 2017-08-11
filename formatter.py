@@ -9,6 +9,7 @@ import maze
 import weather
 import wikipedia
 import news
+import stocks
 
 # Tab /=\|\./l1r1r0l0
 
