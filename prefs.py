@@ -53,12 +53,6 @@ class JsonContainer(dict):
         else:
             return path.join(self.directory, final)
 
-
-def json_from_file(fname, encoding='utf-8'):
-    with open(fname, encoding=encoding) as f:
-        return json.loads(f.read())
-    return None
-
 def get_prefs(pref_path=None, encoding='utf-8'):
     global prefs
     global keys

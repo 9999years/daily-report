@@ -4,6 +4,8 @@ import re
 import subprocess
 import shlex
 import requests
+import json
+from time import sleep
 
 import gen_credentials as creds
 
@@ -131,7 +133,7 @@ def shorten_pretty(url, **kwargs):
     longer = shorten(url, **kwargs)
     return longer[longer.index(':') + 3:]
 
-def request_json(url, cache):
+def request_backbone(url, cache, process=None):
     # already made this request? don't make it again!
     # TODO maybe add a time limit for cache validity
     if url not in cache:
@@ -144,5 +146,28 @@ def request_json(url, cache):
                 # wait a second if we failed --- don't hammer the api
                 sleep(1)
 
-        cache[url] = r.json()
+        cache[url] = process(r) if process is not None else r
     return cache[url], cache
+
+def request_json(url, cache, process=None):
+    ret, cache = request_backbone(url, cache, process)
+    if isinstance(cache[url], requests.Response):
+        cache[url] = ret.json()
+    return cache[url], cache
+
+def request(url, cache, process=None):
+    ret, cache = request_backbone(url, cache, process)
+    if isinstance(cache[url], requests.Response):
+        cache[url] = ret.text
+    return cache[url], cache
+
+def json_from_file(fname, encoding='utf-8'):
+    with open(fname, encoding=encoding) as f:
+        return json.loads(f.read())
+    return None
+
+def listifier(obj):
+    if (not isinstance(obj, list)
+        and not isinstance(obj, tuple)):
+        obj = [obj]
+    return obj
