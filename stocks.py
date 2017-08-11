@@ -253,6 +253,7 @@ def stock_dat(symbols, source=prefs['stocks']['source']):
             # e.g. in case of dow jones (^DJI)
             # default to google finance
             # see https://stackoverflow.com/a/3681992/5719760
+            # replace ^ with . for eg ^DJI (yahoo) to .DJI (google)
             ret.append(google_dat(s['symbol'].replace('^', '.'))[0])
         else:
             ret.append(s)
@@ -290,7 +291,7 @@ def stocks(symbols=prefs['stocks']['symbols']):
         fstr = prefs['stocks']['format']
         if isinstance(symbol, dict):
             if 'format' in symbol:
-                fstr = symbol['format']
+                fstr = prefs['stocks'][symbol['format'] + '_format']
             if ('source' in symbol
                 and symbol['source'] != prefs['stocks']['source']):
                 symdat = stock_dat(symbol['Symbol'], symbol['source'])

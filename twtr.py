@@ -37,14 +37,11 @@ def format_tweet(tweet, style=None):
     })
     fvars.update({
         'pretty_text': misc.fill(extformat(
-            prefs['twitter']['pretty_format'],
+            prefs['twitter']['pretty_text_format'],
             fvars, text=tweet.text.replace('\n', '\n\n')))
     })
-    if style == '__bot__':
-        # "pythonic"
-        fstr = prefs['twitter']['bot_format']
-    elif style is not None:
-        fstr = style
+    if style is not None:
+        fstr = prefs['twitter'][style + '_format']
     else:
         fstr = prefs['twitter']['format']
     return extformat(fstr, fvars)
