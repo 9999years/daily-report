@@ -151,13 +151,13 @@ A larger barrier to entry will be the API keys:
 
 # Functionality coming soon, maybe
 
-* Stock module (hook up with Yahoo Finance?)
 * Output like Unix `cal(1)`
 * Gmail integration
 * ???
 * On this day in history
-* Breaking headlines
 * Birthdays
+* Oh god I need to test this whole thing
+* Updated documentation (news & stocks)
 
 # APIs
 

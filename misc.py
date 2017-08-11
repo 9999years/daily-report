@@ -54,7 +54,7 @@ def format_left(txt, leader='',
     out = f'{firstline}{lines.pop(0)}\n'
     for line in lines:
         out += (f'{leader}{line}\n')
-    return out.rstrip()
+    return out
 
 def center(txt, width=prefs['width'], fillchar=' '):
     return txt.center(width, fillchar)
