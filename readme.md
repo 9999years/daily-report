@@ -2,45 +2,116 @@
 >
 > — “What’s Up?” by 4 Non Blondes (1992, Interscope Records)
 
-The Daily Report is a script to output a daily briefing — I’m hooking it up
-to a cron job and a receipt printer to print out an agenda for me daily.
+The Daily Report is a script to output a daily briefing designed for use with a
+receipt printer (and cron-job / Raspberry Pi).
 
-Usage:
+Usage / sample ouput:
 
     $ ./dailyreport.py
 
              good morning!
-    today is sunday, july 30
-    7:43PM                2017-07-30
+       today is thursday, aug 10
+    5:29PM                2017-08-10
     ════════════════════════════════
-             60-82°F, 10%p
-                 clear
-    6:08AM ↑      14:14     8:22PM ↓
-         ○ first quarter @ 53%
+             65-81°F, 60%p
+        chance of a thunderstorm
+    6:48AM ↑      14:03     8:51PM ↓
+         ○ waning gibbous @ 90%
     ────────────────────────────────
-    tomorrow: 65-85°F, 10%p
-                 clear
+        tomorrow: 58-77°F, 20%p
+             partly cloudy
     ════════════════════════════════
-    84║   │    ···    │××××××××  ║ 8
-    79║×  │  ··   ·  ××        ××║ 6
-    74║ × │ ·      ·× │          ║ 4
-    70║  ××¤×      ×· │         ·║ 3
-    65║   │  ×××× ×   │        · ║ 1
-    61║····      ×   ··········  ║ 0
-    °F×9  12 3  6  9  12 3  6  9 ·%p
+    82║×××  │  ···      │        ║58
+    78║   × │           │  ××    ║46
+    75║    ¤·      ··   │××··××× ║34
+    72║  ·· ×··   ·  ··¤×··  ···×║23
+    69║     │××××××× ×× ·       ·║11
+    66║··   │       ×   │        ║ 0
+    °F×  9  12 3  6  9  12 3  6  ·%p
     ════════════════════════════════
+     6:30AM ║ jay @general
+    ────────────────────────────────
+    all day ║ visit jay (day 6 of 8)
     all day ║ summer break (day 43
             ║ of 60)
     ────────────────────────────────
-    12:00PM ║ work at citysburg
-    ────────────────────────────────
     [] get toothpaste
     ────────────────────────────────
-      5 ║ visit jay (2017-08-04)
-     28 ║ move in day (2017-08-27)
-    148 ║ christmas (2017-12-25)
-    274 ║ birthday (2018-04-30)
+     17 ║ move in day (2017-08-27)
+    137 ║ christmas (2017-12-25)
+    263 ║ birthday (2018-04-30)
+    ════════════════════════════════
+    → Aiming Missiles to Fall Near
+      Guam, North Korea’s Kim Takes
+      New Risk ⟨goo.gl/TSStQP⟩
+    → Trump’s ‘Fire and Fury’ Threat
+      Raises Alarm in Asia
+      ⟨goo.gl/JQDLfS⟩
+    → Memo from Europe: Europe’s
+      Leaders Curtail Summer
+      Holidays in Light of Crises
+      ⟨goo.gl/uJbJn4⟩
+    → Exclusive: Amazon in talks to
+      offer event ticketing in U.S.-
+      sources ⟨goo.gl/5YCNw8⟩
+    ════════════════════════════════
+    @dril: im sorry every one.  the
+    mayor ran out of key to the
+    cities so they had to give me
+    the key to all the girls
+    bathrooms instead
+    ────────────────────────────────
+    9881 likes, 1573 rts
+    2017-08-10 06:40:26AM
+    ════════════════════════════════
+    Tatiana Tolmacheva
+    ────────────────────────────────
+    Tatiana Aleksandrovna Tolmacheva
+    (Russian: Татьяна Александровна
+    Толмачева; January 21, 1907 –
+    October 21, 1998 in Moscow), née
+    Granatkina (Russian: Гранаткина)
+    was a former Soviet figure
+    skater, figure skating coach and
+    one of the founders of Soviet
+    figure skating school, Honoured
+    Master of Sports of the USSR.
+    She started skating as single
+    skater and represented "Dynamo"
+    club in the 1930s. Then she
+    moved to pair skating with
+    partner Alexander Tolmachev.
+    ════════════════════════════════
+    S&P 500     -1.06%       2447.90
+    Dow Jones   -0.93      21,844.01
+    VIX         +27.45%        14.16
+    GOLD        +1.208%       96.745
+    ────────────────────────────────
+    AMZN        -2.06%        961.75
+    GDX         +1.881%       23.025
+    MSFT        -0.63%         72.01
+    RDS-A       -1.13%         56.13
+    FB          -1.64%        168.37
+    GOOGL       -1.16%        929.14
+    TWTR        -1.61%         15.88
+    AAPL        -2.1719%    156.9456
+    TSLA        -0.73%        360.86
 
+In order, we see
+
+* The date and time
+* Today's weather and conditions
+* Today's sunrise, sunset, and total hours of daylight
+* Today's phase of the moon
+* Tomorrow's weather and conditions
+* A graph of temperature and precipitation chances over the next 24 hours
+* Information pulled from Google Calendars, including work shifts, all day
+  events, to-dos, and countdowns.
+* News headlines from Reuters and the New York Times
+* @dril's latest tweet (or nothing if the latest Tweet wasn't made in the past
+  day)
+* A random Wikipedia article
+* Stock prices
 
 Make sure to read/edit `prefs.json`! It controls **all** of the program's
 behavior, from weather location to output format. It is dense by design — I
@@ -51,76 +122,11 @@ Potential usage with `cron`, to print daily at 6am:
 
     0 6 * * * cd /home/pi/daily-report && git pull && ./dailyreport.py | lpr -l
 
+
+
 # Customization
 
-In the abstract, The Daily Report defines functions, referred to as format
-variables, that return strings of potentially interesting content, which are
-replaced by name in various [format strings][fmt-strings].
-
-The primary format string is `prefs.format` (`prefs` is defined in
-`prefs.json`, and I’ll use Javascript-syntax to refer to its keys for ease of
-use, because the `prefs['format']` syntax Python requires is unnecessarily
-verbose).
-
-All format strings can be written as arrays which are joined by newlines before
-being parsed (to make breaking up long strings easier) or as a single string.
-
-All format strings have access to the global format variables, but many have
-access to their own, sometimes nested format variables.
-
-For example, the format of `{sun}`’s output is defined in
-`prefs.weather.sun_format`, which has access to `{sunrise}` (the sunrise time),
-`{daylight}` (the length of the day), and `{sunset}` (the sunset time). From
-there, `{sunrise}` is defined by `prefs.weather.sunrise_format`. It’s a little
-bit silly and certainly rather verbose but it allows you to truly make The
-Daily Report your own.
-
-## Format Variables
-
-### `{hrule}`
-
-Definition: `misc.hrule`.
-
-Description: A horizontal rule formed by repeating `prefs.horiz` `prefs.width`
-times. Multiple consecutive `{hrule}`s and `{thinhrule}`s are compressed into a
-single `{hrule}` in final output.
-
-Example output:
-
-    ================================
-
-### `{thinhrule}`
-
-Definition: `misc.thinhrule`.
-
-Description: A thinner horizontal rule, using `prefs.horiz_light` instead of
-`prefs.horiz` for the fill character. Multiple `{thinhrule}`s are condensed
-into a single `{thinhrule}` in final output.
-
-Example output:
-
-    --------------------------------
-
-### `{today}`
-
-Definition: `dates.today_date`
-
-Description: Today’s date, human-style. From `prefs.dates.today_format`, as a
-[`strftime` escape][strftime]
-
-Example output: `today is sunday, july 30`
-
-### `{iso_date}`
-
-Definition: `dates.iso_date`
-
-Description: [ISO 8601][iso8601]-compliant date.
-
-Example output: `2017-07-30`
-
-### More
-
-Coming soon!
+See [`customization.md`][cust] for details on how to customize The Daily Report.
 
 # Dependencies
 
@@ -135,17 +141,25 @@ You will need *at least*:
 * [`uni2esky`][uni2esky], my own library for converting Unicode strings to Esky
   POS-58 escape sequences. Only necessary if you’d like to print on a receipt
   printer.
+* [`extendedformatter`][extformat], my library for formatting arbitrary strings
+  as `f`-strings.
+* `BeautifulSoup4`
 
 Which you can install with
 
-    pip install google-api-python-client python-twitter requests uni2esky
+    pip install google-api-python-client python-twitter requests uni2esky extendedformatter beautifulsoup4
 
 A larger barrier to entry will be the API keys:
 
 # Functionality coming soon, maybe
 
-* Stock module (hook up with Yahoo Finance?)
+* Output like Unix `cal(1)`
+* Gmail integration
 * ???
+* On this day in history
+* Birthdays
+* Oh god I need to test this whole thing
+* Updated documentation (news & stocks)
 
 # APIs
 
@@ -200,3 +214,5 @@ to do a few things.
 [fmt-strings]: https://docs.python.org/3/library/string.html#format-string-syntax
 [iso8601]: https://en.m.wikipedia.org/wiki/ISO_8601
 [strftime]: https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
+[cust]: ./customization.md
+[extformat]: https://github.com/9999years/extendedformatter
