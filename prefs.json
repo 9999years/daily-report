@@ -1,24 +1,37 @@
 {
 	"format": [
-		"{center('good morning!')}",
-		"{center(today().lower())}",
-		"{align(now_hm(), '', iso_date())}", "{hrule()}",
-		"{center(forecast())}",
-		"{center(conditions().lower())}",
+		"{'good morning!'!c}",
+		"{today()!lc}",
+		"{align(left=now_hm(), right=iso_date())}", "{hrule()}",
+		"{forecast()!c}",
+		"{conditions()!lc}",
 		"{sun()}",
-		"{center(moon())}", "{thinhrule()}",
-		"{center('tomorrow: ' + tmrw_forecast())}",
-		"{center(tmrw_conditions().lower())}", "{hrule()}",
+		"{moon()!c}", "{thinhrule()}",
+		"{'tomorrow: ' + tmrw_forecast()!c}",
+		"{tmrw_conditions()!lc}", "{hrule()}",
 		"{weather_graph()}", "{hrule()}",
 		"{work()}", "{thinhrule()}",
 		"{todo()}", "{thinhrule()}",
-		"{calendar()}", "{thinhrule()}",
+		"{events()}", "{thinhrule()}",
 		"{countdown()}", "{hrule()}",
-		"{twitter('dril')}",
+		"{headlines(news.nytimes('World'))}",
+		"{headline(news.reuters('technologynews'))}",
+		"{thinhrule()}",
+		"{headline('http://www.usefulscience.org/rss.xml')}",
+		"{hrule()}",
+		"{twitter('dril')}", "{hrule()}",
+		"{wikipedia()}", "{hrule()}",
+		"{stocks()}",
 		"\n\n\n\n"
 	],
-	"google_key_path": "google_keys.json",
-	"google_credential_path": "google_credentials.json",
+	"google": {
+		"scopes": [
+			"https://www.googleapis.com/auth/calendar.readonly",
+			"https://www.googleapis.com/auth/urlshortener"
+		],
+		"client_secret_path": "google_client_secrets.json",
+		"credential_path": "google_credentials.json"
+	},
 	"app_name": "the daily report",
 	"api_keys": "keys.json",
 	"width": 32,
@@ -26,6 +39,8 @@
 	"horiz_light": "─",
 	"vert": "║",
 	"vert_light": "│",
+	"paragraph_joiner": "\n\n",
+	"max_retries": 3,
 	"weather": {
 		"location": "va/reston",
 		"height": 6,
@@ -34,7 +49,6 @@
 			"temp":   "×",
 			"both":   "¤"
 		},
-		"max_retries": 3,
 		"forecast_format": "{low}-{high}°F, {precip}%p",
 		"moon": {
 			"bright_graphic": "○",
@@ -50,10 +64,12 @@
 		"temp": "fahrenheit"
 	},
 	"dates": {
-		"today_format": "today is %A, %b %d"
+		"today_format": "today is %A, %b %d",
+		"hours": 12,
+		"all_day": "all day",
+		"ending": "→{time}"
 	},
 	"calendar": {
-		"scope": "https://www.googleapis.com/auth/calendar.readonly",
 		"todo_pat": "to.?do",
 		"countdown_pat": "count.?downs?",
 		"work_pat": ".*work.*",
@@ -66,5 +82,50 @@
 		"halves": false,
 		"start": "S",
 		"end": "E"
+	},
+	"twitter": {
+		"pretty_text_format": "@{user['screen_name']}: {text}",
+		"format": [
+			"{pretty_text}",
+			"{thinhrule()}",
+			"{favorite_count} likes, {retweet_count} rts",
+			"{format(date, '%Y-%m-%d %I:%M:%S%p')}"
+		],
+		"bot_format": [
+			"@{user['screen_name']}", "{text}"
+		]
+	},
+	"wikipedia": {
+		"format": [
+			"{fill(title)}",
+			"{thinhrule()}",
+			"{fill(first)}"
+		]
+	},
+	"news": {
+		"format": [
+			"{format_left(f'{title} ⟨{short_url}⟩',",
+			"firstline='→ ').rstrip()}"
+		]
+	},
+	"stocks": {
+		"format": [
+			"{align(Symbol, f'{PercentChange}'.ljust(8),",
+			"f'{LastTradePriceOnly}{Currency}')}"
+		],
+		"section_end_format": "{default()}\n{thinhrule()}",
+		"source": "yahoo",
+		"symbols": [
+			{ "symbol": "^GSPC", "display_symbol": "S&P 500"},
+			{ "symbol": ".DJI", "display_symbol": "Dow Jones"},
+			{ "symbol": "^VIX", "display_symbol": "VIX"},
+			{ "symbol": "^IXIC", "display_symbol": "NASDAQ"},
+			{ "symbol": "CL=F", "display_symbol": "Oil"},
+			{ "symbol": "GC=F", "display_symbol": "Gold",
+			"style": "section_end" }, "AMZN",
+			"GDX", "MSFT", "RDS-A", "FB", "GOOGL", "TWTR", "AAPL",
+			"TSLA"
+		],
+		"excluded_currencies": ["USD"]
 	}
 }

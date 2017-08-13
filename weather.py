@@ -4,45 +4,26 @@ import requests
 from urllib import parse as urlparse
 from collections import namedtuple
 import os
-from time import sleep
 
-from prefdicts import prefs, keys
+from prefs import prefs, keys
 import misc
-from extendedformatter import formatter, extformat
+from formatter import extformat
 
 # dict of runtime caches, to avoid double requests
 cache = {}
 
-def api_url(endpoint):
+def api_url(endpoint, location=prefs['weather']['location']):
     return ('https://api.wunderground.com/api/'
         + keys['wunderground']
-        + '/'
-        + endpoint
-        + '/q/{location}.json'.format_map(prefs['weather']))
+        + f'/{endpoint}/q/{location}.json')
 
-def weather(endpoint, retries=2):
-    # already made this request? don't make it again!
-    # TODO maybe add a time limit for cache validity
-    if endpoint in cache:
-        return cache[endpoint]
-
-    url = api_url(endpoint)
-
-    # request and retry up to `retries` times
-    for i in range(retries):
-        r = requests.get(url)
-        if r.status_code == requests.codes.ok:
-            break
-        else:
-            # wait a second --- don't hammer the api
-            sleep(1)
-
-    ret = r.json()
-    cache[endpoint] = ret
+def weather(endpoint, location=prefs['weather']['location']):
+    global cache
+    ret, cache = misc.request_json(api_url(endpoint, location), cache)
     return ret
 
-def graph():
-    forecast = weather('hourly')
+def graph(location=prefs['weather']['location']):
+    forecast = weather('hourly', location)
     Weather = namedtuple('Weather', ['temp', 'precip', 'time'])
     moments = []
     i = 0
@@ -133,8 +114,8 @@ def graph():
 
     return '\n'.join(graph)
 
-def day_forecast(day=0):
-    forecast = weather('forecast')['forecast']
+def day_forecast(day=0, location=prefs['weather']['location']):
+    forecast = weather('forecast', location)['forecast']
     day_data = forecast['simpleforecast']['forecastday'][day]
     txt_data = forecast['txt_forecast']['forecastday'][day]
 
@@ -149,50 +130,50 @@ def day_forecast(day=0):
         summary =txt_data['fcttext'],
     )
 
-def conditions(day=0):
-    return (weather('forecast')
+def conditions(day=0, location=prefs['weather']['location']):
+    return (weather('forecast', location)
         ['forecast']
         ['simpleforecast']
         ['forecastday']
         [day]
         ['conditions'])
 
-def tomorrow_conditions():
-    return conditions(day=1)
+def tomorrow_conditions(location=prefs['weather']['location']):
+    return conditions(day=1, location=location)
 
-def today_forecast():
-    return day_forecast(day=0)
+def today_forecast(day=0, location=prefs['weather']['location']):
+    return day_forecast(day=day, location=location)
 
-def tomorrow_forecast():
-    return day_forecast(day=1)
+def tomorrow_forecast(day=1, location=prefs['weather']['location']):
+    return day_forecast(day=day, location=location)
 
 def parsesuntime(t):
     return datetime.datetime.strptime(
         t['hour'].rjust(2, '0') + t['minute'], '%H%M')
 
-def sunrise():
-    times = weather('astronomy')['sun_phase']['sunrise']
+def sunrise(location=prefs['weather']['location']):
+    times = weather('astronomy', location)['sun_phase']['sunrise']
     return parsesuntime(times)
 
-def sunset():
-    times = weather('astronomy')['sun_phase']['sunset']
+def sunset(location=prefs['weather']['location']):
+    times = weather('astronomy', location)['sun_phase']['sunset']
     return parsesuntime(times)
 
-def suntimes():
-    risetime, settime = sunrise(), sunset()
+def suntimes(location=prefs['weather']['location']):
+    risetime, settime = sunrise(location), sunset(location)
     daylight = settime - risetime
 
     risefmt = extformat(
         prefs['weather']['sun']['rise_format'],
-        sunrise=misc.hoursminutes(risetime, pad=''))
+        sunrise=misc.hoursminutes(risetime, fillchar=''))
 
     setfmt = extformat(
         prefs['weather']['sun']['set_format'],
-        sunset=misc.hoursminutes(settime, pad=''))
+        sunset=misc.hoursminutes(settime, fillchar=''))
 
     dayfmt = extformat(
         prefs['weather']['sun']['daylight_format'],
-        daylight=misc.formatdelta(daylight, clock=24))
+        daylight=misc.formatdelta(daylight))
 
     return extformat(
         prefs['weather']['sun']['format'],
@@ -200,8 +181,8 @@ def suntimes():
         sunset  =setfmt,
         daylight=dayfmt,)
 
-def moon():
-    times = weather('astronomy')['moon_phase']
+def moon(location=prefs['weather']['location']):
+    times = weather('astronomy', location)['moon_phase']
     phase = times['phaseofMoon'].lower()
     percent = times['percentIlluminated']
     graphic = (prefs['weather']['moon']['bright_graphic']

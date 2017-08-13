@@ -10,7 +10,10 @@ import textwrap
 # local
 import misc
 import gen_credentials as creds
-from prefdicts import prefs, keys
+from prefs import prefs, keys
+from formatter import extformat
+
+cache = {}
 
 def timezone():
     delt = datetime.datetime.now() - datetime.datetime.utcnow()
@@ -29,7 +32,7 @@ def timezone():
     return datetime.timezone(delt)
 
 
-def today_times():
+def today_times(offset=0):
     # get today at midnight and tomorrow at midnight so we can fetch
     # events for today
     zone = timezone()
@@ -39,11 +42,13 @@ def today_times():
 
     tomorrow = today + datetime.timedelta(days=1)
 
+    today    += datetime.timedelta(days=offset)
+    tomorrow += datetime.timedelta(days=offset)
+
     return today, tomorrow
 
-def today_events(calendar='primary', **kwargs):
-    credentials, http, service = creds.build_creds()
-    today, tomorrow = today_times()
+def today_events(calendar='primary', day=0, **kwargs):
+    today, tomorrow = today_times(day)
 
     args = {
         'calendarId':    calendar,
@@ -55,12 +60,26 @@ def today_events(calendar='primary', **kwargs):
 
     args.update(kwargs)
 
-    eventsResult = service.events().list(**args).execute()
+    # using a dict... as a dict key?
+    # pull requests are open if *you've* got something better
+    strargs = str(args)
+    if strargs in cache:
+        eventsResult = cache[strargs]
+    else:
+        credentials, http, service = creds.build_creds()
+        eventsResult = service.events().list(**args).execute()
+        cache[strargs] = eventsResult
+
     return eventsResult.get('items', [])
 
 def list_calendars():
-    credentials, http, service = creds.build_creds()
-    return service.calendarList().list().execute()['items']
+    if 'calendarList' in cache:
+        ret = cache['calendarList']
+    else:
+        credentials, http, service = creds.build_creds()
+        ret = service.calendarList().list().execute()
+        cache['calendarList'] = ret
+    return ret['items']
 
 def calendar_match(pat, regex=True):
     cals = list_calendars()
@@ -108,11 +127,17 @@ def event_times(event):
     return event
 
 def format_event(time, event):
+    today, tomorrow = today_times()
+
     leader = ' ' + prefs['vert'] + ' '
-    if time == 'all day' and event['duration'].days > 1:
+    if time == prefs['dates']['all_day'] and event['duration'].days > 1:
+        time = extformat(prefs['dates']['all_day'], event)
         event['summary'] += (' (day '
-            + str((today - event['start']).days) + ' of '
+            + str((today - event['start']).days + 1) + ' of '
             + str((event['end'] - event['start']).days) + ')')
+    elif time == prefs['dates']['ending']:
+        time = extformat(prefs['dates']['ending'],
+            event, time=misc.hoursminutes(event['end']))
 
     return misc.format_left(event['summary'],
         leader=leader, firstline=time + leader)
@@ -149,7 +174,7 @@ def today_countdowns():
     ret = ''
     def add_countdown(event):
         nonlocal ret
-        event['summary'] += event['start'].strftime(' (%Y-%m-%d)')
+        event['summary'] += format(event['start'], ' (%Y-%m-%d)')
         leader = ' ' + prefs['vert'] + ' '
         ret += misc.format_left(event['summary'],
             leader=leader,
@@ -182,42 +207,54 @@ def today_work():
     for cal in work_cals:
         shifts.extend(today_events(cal['id']))
 
-    out = ''
+    out = []
     for shift in shifts:
         shift = event_times(shift)
-        out += format_event(misc.hoursminutes(shift['start']), shift)
+        out.append(format_event(misc.hoursminutes(shift['start']), shift))
 
-    return out.rstrip()
+    return ''.join(out).rstrip()
 
-def events():
-    today, tomorrow = today_times()
+def events(day=0):
+    today, tomorrow = today_times(day)
 
-    events = today_events()
+    events = today_events(day=day)
     alldays = []
+    endings = []
     todays = []
     for event in events:
         event = event_times(event)
         if event['start'] <= today and event['end'] >= tomorrow:
+            # all day!
             alldays.append(event)
+        elif event['start'] <= today and event['end'] <= tomorrow:
+            # multi-day event (like an all-day) that we’re not in the middle of
+            endings.append(event)
         else:
             todays.append(event)
 
-    out = ''
+    out = []
     for event in alldays:
-        out += format_event('all day', event)
+        out.append(format_event(prefs['dates']['all_day'], event))
 
-    out += misc.thinhrule() + '\n'
+    out.append(misc.thinhrule() + '\n')
+
+    # TODO: this is so massively unclear. nobody who hasnt written this program
+    # will ever know what it means
+    for event in endings:
+        out.append(format_event(prefs['dates']['ending'], event))
+
+    out.append(misc.thinhrule() + '\n')
 
     for event in todays:
-        out += format_event(misc.hoursminutes(event['start']), event)
+        out.append(format_event(misc.hoursminutes(event['start']), event))
 
-    return out.rstrip()
+    return ''.join(out).rstrip()
 
-def today_date():
-    return today_times()[0].strftime(prefs['dates']['today_format'])
+def today_date(day=0):
+    return format(today_times(day)[0], prefs['dates']['today_format'])
 
-def now_hm():
-    return misc.hoursminutes(datetime.datetime.now(), pad='')
+def now_hm(fillchar=''):
+    return misc.hoursminutes(datetime.datetime.now(), fillchar=fillchar)
 
-def iso_date():
-    return today_times()[0].strftime('%Y-%m-%d')
+def iso_date(day=0):
+    return format(today_times(day)[0], '%Y-%m-%d')

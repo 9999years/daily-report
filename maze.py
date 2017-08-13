@@ -5,7 +5,7 @@
 # http://www.vidarholen.net/~vidar/generatemaze.py
 
 import random
-from prefdicts import prefs, keys
+from prefs import prefs, keys
 
 # so we can deal with directions with binary addition / subtraction
 # north and south = north + south or north | south yknow that kinda deal
@@ -69,7 +69,7 @@ class Cell():
             + int(bottom.right) * south
             + int(right.bottom) * east)
 
-def gen(w, h):
+def gen(w=prefs['width'], h=prefs['maze']['height']):
     if h < 3 or w < 3:
         return 'maze width and height MUST be ≥3'
 
