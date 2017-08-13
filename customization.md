@@ -1,3 +1,37 @@
+# Table of Contents
+
+* [Customization](#customization)
+    * [Global Format Functions](#global-format-functions)
+        * [`hrule`](#hrule)
+        * [`thinhrule`](#thinhrule)
+        * [`center(string, [width=prefs.width,] [fillchar=' '])`](#centerstring-widthprefswidth-fillchar-)
+        * [`right(string, [width=prefs.width,] [fillchar=' '])`](#rightstring-widthprefswidth-fillchar-)
+        * [`align(left='', center='', right='', width=prefs.width, fillchar=' ')`](#alignleft-center-right-widthprefswidth-fillchar-)
+        * [`today`](#today)
+        * [`iso_date`](#iso_date)
+        * [`now_hm(fillchar='')`](#now_hmfillchar)
+        * [`calendar`](#calendar)
+        * [`countdown`](#countdown)
+        * [`todo`](#todo)
+        * [`work`](#work)
+        * [`twitter(handle='dril')`](#twitterhandledril)
+        * [`maze`](#maze)
+        * [`forecast`](#forecast)
+        * [`tmrw_forecast`](#tmrw_forecast)
+        * [`conditions`](#conditions)
+        * [`tmrw_conditions`](#tmrw_conditions)
+        * [`weather_graph`](#weather_graph)
+        * [`sun`](#sun)
+        * [`moon`](#moon)
+        * [`headlines(url=news.reuters('worldnews'), amount=3, style=prefs.news.format)`](#headlinesurlnewsreutersworldnews-amount3-styleprefsnewsformat)
+    * [Local Format Variables](#local-format-variables)
+        * [`forecast`](#forecast-1)
+        * [`moon`](#moon-1)
+        * [`sun`](#sun-1)
+        * [`twitter`](#twitter)
+        * [`stocks`](#stocks)
+        * [`headlines`](#headlines)
+
 # Customization
 
 `prefs.json` is designed to make customization of The Daily Report flexible and
@@ -316,12 +350,14 @@ Example output:
 
          ○ first quarter @ 53%
 
-### `headlines(url=news.reuters('worldnews'), amount=3)`
+### `headlines(url=news.reuters('worldnews'), amount=3, style=prefs.news.format)`
 
 Definition: `news.headlines`
 
-Description: 3 (or more!) headlines from the RSS feed of your choice. Just a
-generic RSS parser, so feel free to plug whatever you'd like into it!
+Alias: `rss`
+
+Description: 3 (or more, or less) headlines from the RSS feed of your choice.
+Just a generic RSS parser, so feel free to plug whatever you'd like into it!
 
 ## Local Format Variables
 
@@ -362,6 +398,15 @@ everything else in a `tweet.AsDict()` ||
 
 ### `stocks`
 
+Data comes from Yahoo Finance, so it's extensive! All variables are listed
+below, but some useful ones are
+
+variable | description | example
+---------|-------------|---------
+`Symbol` | ticker symbol | AAPL
+`PercentChange` |  | +2.06%
+`LastTradePriceOnly` | | 2844.01
+
 `AfterHoursChangeRealtime`, `AnnualizedGain`, `Ask`, `AskRealtime`,
 `AverageDailyVolume`, `Bid`, `BidRealtime`, `BookValue`, `Change`,
 `ChangeFromFiftydayMovingAverage`, `ChangeFromTwoHundreddayMovingAverage`,
@@ -386,3 +431,10 @@ everything else in a `tweet.AsDict()` ||
 `ShortRatio`, `StockExchange`, `Symbol`, `TickerTrend`, `TradeDate`,
 `TwoHundreddayMovingAverage`, `Volume`, `YearHigh`, `YearLow`, `YearRange`,
 `symbol`
+
+### `headlines`
+
+In addition to `title`, `description`, and `url`, standard for the RSS format, a
+`short_url` is available for `goo.gl` URLs, and `date` is available as a
+`datetime` object (so use it with something like `format(date, '%Y-%m-%d
+%I:%M:%S%p')`).

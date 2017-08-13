@@ -42,7 +42,7 @@
 	"paragraph_joiner": "\n\n",
 	"max_retries": 3,
 	"weather": {
-		"location": "in/south_bend",
+		"location": "va/reston",
 		"height": 6,
 		"chars": {
 			"precip": "·",

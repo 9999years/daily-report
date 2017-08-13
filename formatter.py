@@ -50,6 +50,7 @@ formatter.extend_env(
     moon            =   weather.moon,
     wikipedia       = wikipedia.random,
     headlines       =      news.headlines,
+    rss             =      news.headlines,
     headline        =      news.headline,
     stocks          =    stocks.stocks,
 
