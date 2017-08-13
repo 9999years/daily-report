@@ -86,7 +86,7 @@ def stories(url=reuters('worldnews')):
         ret.append(s)
     return ret
 
-def format_story(story):
+def format_story(story, style):
     desc = BeautifulSoup(story.description.text, 'html.parser')
     head = BeautifulSoup(story.title.text, 'html.parser')
 
@@ -107,7 +107,10 @@ def format_story(story):
                 # FUCK THE TIME
                 pubdate = datetime.min
 
-    return extformat(prefs['news']['format'],
+    fstr = (prefs['news']['format'] if style is None
+        else prefs['news'][style + '_format'])
+
+    return extformat(fstr,
         description=desc.text,
         title=head.text,
         url=story.guid.text,
@@ -115,20 +118,20 @@ def format_story(story):
         date=pubdate,
         )
 
-def headlines(url=reuters('worldnews'), amount=3):
+def headlines(url=reuters('worldnews'), amount=3, style=None):
     """
     list of zones: https://www.reuters.com/tools/rss
     """
     ret = []
     for i, story in zip(range(amount), stories(url)):
-        ret.append(format_story(story))
+        ret.append(format_story(story, style))
     return '\n'.join(ret)
 
-def headline(url=reuters('worldnews')):
+def headline(url=reuters('worldnews'), style=None):
     """
     alias for headlines(url, amount=1)
     """
-    return headlines(url, amount=1)
+    return headlines(url, amount=1, style=style)
 
 def main():
     import argparse

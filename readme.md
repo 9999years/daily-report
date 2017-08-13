@@ -122,6 +122,8 @@ Potential usage with `cron`, to print daily at 6am:
 
     0 6 * * * cd /home/pi/daily-report && git pull && ./dailyreport.py | lpr -l
 
+
+
 # Customization
 
 See [`customization.md`][cust] for details on how to customize The Daily Report.

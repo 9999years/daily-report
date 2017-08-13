@@ -290,8 +290,8 @@ def stocks(symbols=prefs['stocks']['symbols']):
     for symdat, symbol in zip(dat, symbols):
         fstr = prefs['stocks']['format']
         if isinstance(symbol, dict):
-            if 'format' in symbol:
-                fstr = prefs['stocks'][symbol['format'] + '_format']
+            if 'style' in symbol:
+                fstr = prefs['stocks'][symbol['style'] + '_format']
             if ('source' in symbol
                 and symbol['source'] != prefs['stocks']['source']):
                 symdat = stock_dat(symbol['Symbol'], symbol['source'])
