@@ -32,13 +32,15 @@ def get_date(tweet):
 
 def format_tweet(tweet, style=None):
     fvars = tweet.AsDict()
+    if fvars['retweeted_status'] is not None:
+        fvars.update(fvars['retweeted_status'])
     fvars.update({
         'date': get_date(tweet),
     })
     fvars.update({
         'pretty_text': misc.fill(extformat(
             prefs['twitter']['pretty_text_format'],
-            fvars, text=tweet.text.replace('\n', '\n\n')))
+            fvars, text=fvars['text'].replace('\n', '\n\n')))
     })
     if style is not None:
         fstr = prefs['twitter'][style + '_format']

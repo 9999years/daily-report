@@ -35,7 +35,7 @@
 	},
 	"app_name": "the daily report",
 	"api_keys": "keys.json",
-	"width": 32,
+	"width": 40,
 	"horiz": "═",
 	"horiz_light": "─",
 	"vert": "║",
