@@ -32,7 +32,7 @@ def get_date(tweet):
 
 def format_tweet(tweet, style=None):
     fvars = tweet.AsDict()
-    if fvars['retweeted_status'] is not None:
+    if 'retweeted_status' in fvars and fvars['retweeted_status'] is not None:
         fvars.update(fvars['retweeted_status'])
     fvars.update({
         'date': get_date(tweet),
