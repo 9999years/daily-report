@@ -19,6 +19,7 @@
 		"{thinhrule()}",
 		"{headline('http://www.usefulscience.org/rss.xml')}",
 		"{hrule()}",
+		"{twitter('IGD_News')}", "{hrule()}",
 		"{twitter('dril')}", "{hrule()}",
 		"{wikipedia()}", "{hrule()}",
 		"{stocks()}",
