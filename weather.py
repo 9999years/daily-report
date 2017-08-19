@@ -28,14 +28,14 @@ def hours(length=24, location=prefs['weather']['location']):
     forecast = weather('hourly', location)
     Weather = namedtuple('Weather', ['temp', 'precip', 'time'])
     for i, hour in enumerate(forecast['hourly_forecast']):
+        if i >= length:
+            break
         moments.append(Weather(
             temp=int(hour['temp']['english']),
             precip=int(hour['pop']),
             time=str(int(hour['FCTTIME']['hour']) % 12 + 1)
             + hour['FCTTIME']['ampm']
         ))
-        if i > length:
-            break
     return moments
 
 def graph(location=prefs['weather']['location']):
@@ -44,7 +44,6 @@ def graph(location=prefs['weather']['location']):
     margin = 3
     inner_width = width - 2 * margin
     moments = hours(length=inner_width, location=location)
-    print(moments)
 
     def limit(list, fn, key):
         return getattr(fn(list, key=lambda x: getattr(x, key)), key)
@@ -59,6 +58,9 @@ def graph(location=prefs['weather']['location']):
     def place(val, x, y, align='left'):
         nonlocal graph
         field = graph
+        if y > len(field) or x > len(field[y]):
+            return
+
         if align is 'left':
             field[y] = field[y][0:x] + val + field[y][x + len(val):]
         elif align is 'right':
