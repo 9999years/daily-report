@@ -16,8 +16,6 @@
 		"{countdown()}", "{hrule()}",
 		"{headlines(news.nytimes('World'))}",
 		"{headline(news.reuters('technologynews'))}",
-		"{thinhrule()}",
-		"{headline('http://www.usefulscience.org/rss.xml')}",
 		"{hrule()}",
 		"{twitter('IGD_News')}", "{hrule()}",
 		"{twitter('dril')}", "{hrule()}",

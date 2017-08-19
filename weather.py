@@ -1,3 +1,4 @@
+#! /usr/local/bin/python3
 import datetime
 import json
 import requests
@@ -22,22 +23,28 @@ def weather(endpoint, location=prefs['weather']['location']):
     ret, cache = misc.request_json(api_url(endpoint, location), cache)
     return ret
 
-def graph(location=prefs['weather']['location']):
+def hours(length=24, location=prefs['weather']['location']):
+    moments = []
     forecast = weather('hourly', location)
     Weather = namedtuple('Weather', ['temp', 'precip', 'time'])
-    moments = []
-    i = 0
-    for hour in forecast['hourly_forecast']:
+    for i, hour in enumerate(forecast['hourly_forecast']):
         moments.append(Weather(
             temp=int(hour['temp']['english']),
             precip=int(hour['pop']),
             time=str(int(hour['FCTTIME']['hour']) % 12 + 1)
             + hour['FCTTIME']['ampm']
         ))
-        if i > 24:
+        if i > length:
             break
-        else:
-            i += 1
+    return moments
+
+def graph(location=prefs['weather']['location']):
+    width = prefs['width']
+    height = prefs['weather']['height']
+    margin = 3
+    inner_width = width - 2 * margin
+    moments = hours(length=inner_width, location=location)
+    print(moments)
 
     def limit(list, fn, key):
         return getattr(fn(list, key=lambda x: getattr(x, key)), key)
@@ -57,10 +64,7 @@ def graph(location=prefs['weather']['location']):
         elif align is 'right':
             field[y] = field[y][0:x - len(val)] + val + field[y][x:]
 
-    width = prefs['width']
-    height = prefs['weather']['height']
-    margin = 3
-    step = int((width - 2 * margin) / len(moments))
+    step = int((inner_width) / len(moments))
     time_rows = 1
     # time_rows = 3 * step
 
@@ -110,7 +114,6 @@ def graph(location=prefs['weather']['location']):
             place(chars['both'], i, precip_y)
         else:
             place(chars['precip'], i, precip_y)
-
 
     return '\n'.join(graph)
 
@@ -193,7 +196,8 @@ def moon(location=prefs['weather']['location']):
         **locals())
 
 def main():
-    forecast()
+    print(today_forecast())
+    print(graph())
 
 if __name__ == '__main__':
     main()
