@@ -2,6 +2,7 @@ import twitter
 import datetime
 import dates
 import textwrap
+import html
 
 # local
 from prefs import prefs, keys
@@ -34,6 +35,7 @@ def format_tweet(tweet, style=None):
     fvars = tweet.AsDict()
     if 'retweeted_status' in fvars and fvars['retweeted_status'] is not None:
         fvars.update(fvars['retweeted_status'])
+    fvars['text'] = html.unescape(fvars['text'])
     fvars.update({
         'date': get_date(tweet),
     })

@@ -108,8 +108,8 @@
 	},
 	"stocks": {
 		"format": [
-			"{align(Symbol, f'{PercentChange}'.ljust(8),",
-			"f'{LastTradePriceOnly}{Currency}')}"
+			"{align(Symbol, f'{format(PercentChange, \" ,.2f\")}%'.ljust(8),",
+			"f'{format(LastTradePriceOnly, \",.2f\")}{Currency}')}"
 		],
 		"section_end_format": "{default()}\n{thinhrule()}",
 		"source": "yahoo",
