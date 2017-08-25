@@ -3,6 +3,7 @@ import urllib
 import json
 
 import misc
+from time import sleep
 from prefs import prefs, keys
 from formatter import extformat
 
@@ -94,6 +95,68 @@ emptyquote = {
     'symbol'                                         ,
 }
 
+numerkeys = [
+    'Ask',
+    'AverageDailyVolume',
+    'Bid',
+    'AskRealtime',
+    'BidRealtime',
+    'BookValue',
+    'Change',
+    'ChangeRealtime',
+    'AfterHoursChangeRealtime',
+    'DividendShare',
+    'EarningsShare',
+    'EPSEstimateCurrentYear',
+    'EPSEstimateNextYear',
+    'EPSEstimateNextQuarter',
+    'DaysLow',
+    'DaysHigh',
+    'YearLow',
+    'YearHigh',
+    'HoldingsGainPercent',
+    'AnnualizedGain',
+    'HoldingsGain',
+    'HoldingsGainPercentRealtime',
+    'HoldingsGainRealtime',
+    'MarketCapitalization',
+    'MarketCapRealtime',
+    'EBITDA',
+    'ChangeFromYearLow',
+    'PercentChangeFromYearLow',
+    'ChangePercentRealtime',
+    'ChangeFromYearHigh',
+    'PercebtChangeFromYearHigh',
+    'LastTradePriceOnly',
+    'FiftydayMovingAverage',
+    'TwoHundreddayMovingAverage',
+    'ChangeFromTwoHundreddayMovingAverage',
+    'PercentChangeFromTwoHundreddayMovingAverage',
+    'ChangeFromFiftydayMovingAverage',
+    'PercentChangeFromFiftydayMovingAverage',
+    'Open',
+    'PreviousClose',
+    'PricePaid',
+    'ChangeinPercent',
+    'PriceSales',
+    'PriceBook',
+    'PERatio',
+    'PERatioRealtime',
+    'PEGRatio',
+    'PriceEPSEstimateCurrentYear',
+    'PriceEPSEstimateNextYear',
+    'SharesOwned',
+    'ShortRatio',
+    'OneyrTargetPrice',
+    'Volume',
+    'HoldingsValue',
+    'HoldingsValueRealtime',
+    'DaysValueChange',
+    'DaysValueChangeRealtime',
+    'DividendYield',
+    'PercentChange',
+]
+
 def query(url):
     """
     local wrapper around misc.request_json
@@ -120,14 +183,18 @@ def google_query(url):
     performs caching
     """
     global cache
-    ret, cache = misc.request(url, cache)
-    if isinstance(ret, str):
-        # google returns a `// [` before and a `]` after the data we can get rid
-        # of with a slice
-        if ret == 'httpserver.cc: Response Code 400':
-            ret = cache[url] = '400 error bad request'
-        else:
-            ret = cache[url] = json.loads(ret[4:])
+    bad_request_str = 'httpserver.cc: Response Code 400\n'
+    for i in range(prefs['max_retries']):
+        ret, cache = misc.request(url, cache)
+        if isinstance(ret, str):
+            if ret != bad_request_str:
+                # google returns a `// [` before and a `]` after the data we can get rid
+                # of with a slice
+                ret = cache[url] = json.loads(ret[4:])
+                break
+            else:
+                ret = []
+                sleep(1)
     return ret
 
 def yahoo_query_url(query):
@@ -222,10 +289,11 @@ def google_dat(symbols):
 
     for symbol in dat:
         # convert short keys to long keys
+        out = {}
         for key in symbol:
             if key in fullnames:
-                symbol[fullnames[key]] = symbol.pop(key)
-        ret.append(fill_quote(symbol))
+                out[fullnames[key]] = symbol[key]
+        ret.append(fill_quote(out))
 
     return ret
 
@@ -238,6 +306,31 @@ def yahoo_dat(symbols):
     dat = yahoo_query(yahoo_stock_query(symbols))
 
     return misc.listifier(dat)
+
+def extfloat(s):
+    """
+    more leniant float parsing
+    """
+    if isinstance(s, float) or isinstance(s, int):
+        return s
+    elif s is None or len(s) == 0:
+        return None
+    else:
+        striplast = True
+        if s[-1] == 'M':
+            factor = 1e6
+        elif s[-1] == 'B':
+            factor = 1e9
+        elif s[-1] == 'T':
+            factor = 1e12
+        else:
+            striplast = False
+            factor = 1
+        if striplast:
+            s = s[:-1]
+        new_s = s.replace('%', '').replace(',', '')
+
+        return float(new_s) * factor
 
 def stock_dat(symbols, source=prefs['stocks']['source']):
     if source == 'yahoo':
@@ -254,8 +347,16 @@ def stock_dat(symbols, source=prefs['stocks']['source']):
             # default to google finance
             # see https://stackoverflow.com/a/3681992/5719760
             # replace ^ with . for eg ^DJI (yahoo) to .DJI (google)
-            ret.append(google_dat(orig.replace('^', '.'))[0])
-        else:
+            tmp = google_dat(orig.replace('^', '.'))
+            if len(tmp) > 0:
+                s = tmp[0]
+            else:
+                s = None
+
+        if s is not None:
+            for numkey in numerkeys:
+                if numkey in s:
+                    s[numkey] = extfloat(s[numkey])
             ret.append(s)
     return ret
 
@@ -276,6 +377,23 @@ def symbol_list(symbols):
             ret.append(str(s))
     return ret
 
+def format_stock(dat, symbol):
+    fstr = prefs['stocks']['format']
+    if isinstance(symbol, dict):
+        if 'style' in symbol:
+            fstr = prefs['stocks'][symbol['style'] + '_format']
+        if ('source' in symbol
+            and symbol['source'] != prefs['stocks']['source']):
+            dat = stock_dat(symbol['Symbol'], symbol['source'])
+        if 'display_symbol' in symbol:
+            dat['Symbol'] = symbol['display_symbol']
+
+    if dat['Currency'] in prefs['stocks']['excluded_currencies']:
+        dat['Currency'] = ''
+
+    return extformat(fstr, dat,
+        default=lambda: extformat(prefs['stocks']['format'], dat))
+
 def stocks(symbols=prefs['stocks']['symbols']):
     """
     assembles and formats output from a list/tuple of symbols
@@ -288,20 +406,7 @@ def stocks(symbols=prefs['stocks']['symbols']):
 
     ret = []
     for symdat, symbol in zip(dat, symbols):
-        fstr = prefs['stocks']['format']
-        if isinstance(symbol, dict):
-            if 'style' in symbol:
-                fstr = prefs['stocks'][symbol['style'] + '_format']
-            if ('source' in symbol
-                and symbol['source'] != prefs['stocks']['source']):
-                symdat = stock_dat(symbol['Symbol'], symbol['source'])
-            if 'display_symbol' in symbol:
-                symdat['Symbol'] = symbol['display_symbol']
-
-        if symdat['Currency'] in prefs['stocks']['excluded_currencies']:
-            symdat['Currency'] = ''
-        ret.append(extformat(fstr, symdat,
-            default=lambda: extformat(prefs['stocks']['format'], symdat)))
+        ret.append(format_stock(symdat, symbol))
 
     return '\n'.join(ret)
 
