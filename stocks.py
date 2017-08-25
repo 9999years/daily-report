@@ -246,9 +246,9 @@ def stock_dat(symbols, source=prefs['stocks']['source']):
         dat = google_dat(symbols)
     ret = []
     for s in dat:
-        if (s['PreviousClose'] is None and
-            s['PercentChange'] is None and
-            s['Volume'] is None):
+        if (('PreviousClose' not in s or s['PreviousClose'] is None) and
+            ('PercentChange' not in s or s['PercentChange'] is None) and
+            ('Volume'        not in s or s['Volume']        is None)):
             # yahoo finance isn't able to return data
             # e.g. in case of dow jones (^DJI)
             # default to google finance
