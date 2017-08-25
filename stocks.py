@@ -124,7 +124,7 @@ def google_query(url):
     if isinstance(ret, str):
         # google returns a `// [` before and a `]` after the data we can get rid
         # of with a slice
-        if ret == 'server.cc: Response Code 400':
+        if ret == 'httpserver.cc: Response Code 400':
             ret = cache[url] = '400 error bad request'
         else:
             ret = cache[url] = json.loads(ret[4:])
@@ -245,7 +245,7 @@ def stock_dat(symbols, source=prefs['stocks']['source']):
     else: # google
         dat = google_dat(symbols)
     ret = []
-    for s in dat:
+    for s, orig in zip(dat, symbols):
         if (('PreviousClose' not in s or s['PreviousClose'] is None) and
             ('PercentChange' not in s or s['PercentChange'] is None) and
             ('Volume'        not in s or s['Volume']        is None)):
@@ -254,7 +254,7 @@ def stock_dat(symbols, source=prefs['stocks']['source']):
             # default to google finance
             # see https://stackoverflow.com/a/3681992/5719760
             # replace ^ with . for eg ^DJI (yahoo) to .DJI (google)
-            ret.append(google_dat(s['symbol'].replace('^', '.'))[0])
+            ret.append(google_dat(orig.replace('^', '.'))[0])
         else:
             ret.append(s)
     return ret

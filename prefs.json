@@ -19,7 +19,6 @@
 		"{hrule()}",
 		"{twitter('IGD_News')}", "{hrule()}",
 		"{twitter('dril')}", "{hrule()}",
-		"{wikipedia()}", "{hrule()}",
 		"{stocks()}",
 		"\n\n\n\n"
 	],
