@@ -38,6 +38,7 @@ formatter.extend_env(
     countdown       =     dates.today_countdowns,
     todo            =     dates.today_todos,
     work            =     dates.today_work,
+    classes         =     dates.today_classes,
     twitter         =      twtr.last,
     twitter_bot     =      twtr.bot,
     maze            =      maze.from_prefs,

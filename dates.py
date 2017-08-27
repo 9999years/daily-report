@@ -84,17 +84,32 @@ def list_calendars():
 def calendar_match(pat, regex=True):
     cals = list_calendars()
     outs = []
+    key = 'summary'
+    if isinstance(pat, dict):
+        key = pat['key'] if 'key' in pat else 'summary'
+        pat = pat['pat']
+
     for cal in cals:
-        if regex and re.search(pat, cal['summary'], flags=re.IGNORECASE):
-            outs.append(cal)
-        elif pat in cal['summary']:
-            outs.append(cal)
+        if 'summaryOverride' in cal:
+            cal['summary'] = cal['summaryOverride']
+
+        if key in cal:
+            if regex and re.search(pat, cal[key], flags=re.IGNORECASE):
+                outs.append(cal)
+            elif pat in cal[key]:
+                outs.append(cal)
     return outs
 
 def event_times(event):
     '''takes a google calendar event, returns the start / end times and
     duration as a 3-tuple
     '''
+
+    if (isinstance(event['start'], datetime.datetime) and
+        isinstance(event['end'],   datetime.datetime)):
+        # already done
+        return event
+
     dt_format = '%Y-%m-%dT%H:%M:%S%z'
     d_format  = '%Y-%m-%d'
     # yyyy-mm-ddThh-mm-ss±hh:mm
@@ -150,11 +165,11 @@ def format_todos(todos):
             firstline=prefs['calendar']['todo_check'])
     return ret
 
-def today_todos():
+def today_todos(day=0):
     todos = []
     todo_cals = calendar_match(prefs['calendar']['todo_pat'])
     for cal in todo_cals:
-        todos.extend(today_events(cal['id'], orderBy='updated'))
+        todos.extend(today_events(cal['id'], day=day, orderBy='updated'))
 
     todo_list = []
     for todo in todos:
@@ -164,7 +179,7 @@ def today_todos():
 
     return ret.rstrip()
 
-def today_countdowns():
+def today_countdowns(day=0):
     today, tomorrow = today_times()
     countdown_cals = calendar_match(prefs['calendar']['countdown_pat'])
 
@@ -182,7 +197,7 @@ def today_countdowns():
 
     countdowns = []
     for cal in countdown_cals:
-        events = (today_events(calendar=cal['id'],
+        events = (today_events(calendar=cal['id'], day=day,
             maxResults=prefs['calendar']['max_countdowns'],
             timeMax=None))
         for event in events:
@@ -200,12 +215,30 @@ def today_countdowns():
 
     return ret.rstrip()
 
-def today_work():
+def today_classes(day=0):
+    class_cals = calendar_match(prefs['calendar']['class_pat'])
+
+    classes = []
+    for cal in class_cals:
+        classes.extend(today_events(cal['id'], day=day))
+
+    out = []
+    for event in classes:
+        event = event_times(event)
+        if '_daily_report_processed' not in event:
+            event['summary'] += extformat(' ' + prefs['dates']['ending'],
+                event, time=misc.hoursminutes(event['end']))
+            event['_daily_report_processed'] = True
+        out.append(format_event(misc.hoursminutes(event['start']), event))
+
+    return ''.join(out).rstrip()
+
+def today_work(day=0):
     work_cals = calendar_match(prefs['calendar']['work_pat'])
 
     shifts = []
     for cal in work_cals:
-        shifts.extend(today_events(cal['id']))
+        shifts.extend(today_events(cal['id'], day=day))
 
     out = []
     for shift in shifts:
@@ -238,8 +271,8 @@ def events(day=0):
 
     out.append(misc.thinhrule() + '\n')
 
-    # TODO: this is so massively unclear. nobody who hasnt written this program
-    # will ever know what it means
+    # TODO: this output is so massively unclear. nobody who hasnt written this
+    # program will ever know what it means
     for event in endings:
         out.append(format_event(prefs['dates']['ending'], event))
 

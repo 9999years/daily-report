@@ -10,7 +10,7 @@
 		"{'tomorrow: ' + tmrw_forecast()!c}",
 		"{tmrw_conditions()!lc}", "{hrule()}",
 		"{weather_graph()}", "{hrule()}",
-		"{work()}", "{thinhrule()}",
+		"{classes()}", "{thinhrule()}",
 		"{todo()}", "{thinhrule()}",
 		"{events()}", "{thinhrule()}",
 		"{countdown()}", "{hrule()}",
@@ -40,7 +40,7 @@
 	"paragraph_joiner": "\n\n",
 	"max_retries": 3,
 	"weather": {
-		"location": "va/reston",
+		"location": "ma/waltham",
 		"height": 6,
 		"chars": {
 			"precip": "·",
@@ -71,6 +71,7 @@
 		"todo_pat": "to.?do",
 		"countdown_pat": "count.?downs?",
 		"work_pat": ".*work.*",
+		"class_pat": ".*class(es)?.*",
 		"todo_check": "[] ",
 		"max_countdowns": 10
 	},
