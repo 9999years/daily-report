@@ -9,6 +9,7 @@ from formatter import extformat
 
 cache = {}
 
+# we merge stocks with this so keyerrors dont happen
 emptyquote = {
     'AfterHoursChangeRealtime'                       ,
     'AnnualizedGain'                                 ,
@@ -95,6 +96,7 @@ emptyquote = {
     'symbol'                                         ,
 }
 
+# numeric key values we should convert to numbers instead of strings
 numerkeys = [
     'Ask',
     'AverageDailyVolume',
@@ -333,31 +335,32 @@ def extfloat(s):
         return float(new_s) * factor
 
 def stock_dat(symbols, source=prefs['stocks']['source']):
-    if source == 'yahoo':
-        dat = yahoo_dat(symbols)
-    else: # google
-        dat = google_dat(symbols)
+    dat = yahoo_dat(symbols)
+    # if source == 'yahoo':
+        # dat = yahoo_dat(symbols)
+    # else: # google
+        # dat = google_dat(symbols)
     ret = []
     for s, orig in zip(dat, symbols):
-        if (('PreviousClose' not in s or s['PreviousClose'] is None) and
-            ('PercentChange' not in s or s['PercentChange'] is None) and
-            ('Volume'        not in s or s['Volume']        is None)):
-            # yahoo finance isn't able to return data
-            # e.g. in case of dow jones (^DJI)
-            # default to google finance
-            # see https://stackoverflow.com/a/3681992/5719760
-            # replace ^ with . for eg ^DJI (yahoo) to .DJI (google)
-            tmp = google_dat(orig.replace('^', '.'))
-            if len(tmp) > 0:
-                s = tmp[0]
-            else:
-                s = None
+        # if (('PreviousClose' not in s or s['PreviousClose'] is None) and
+            # ('PercentChange' not in s or s['PercentChange'] is None) and
+            # ('Volume'        not in s or s['Volume']        is None)):
+            # # yahoo finance isn't able to return data
+            # # e.g. in case of dow jones (^DJI)
+            # # default to google finance
+            # # see https://stackoverflow.com/a/3681992/5719760
+            # # replace ^ with . for eg ^DJI (yahoo) to .DJI (google)
+            # tmp = google_dat(orig.replace('^', '.'))
+            # if len(tmp) > 0:
+                # s = tmp[0]
+            # else:
+                # s = None
 
         if s is not None:
             for numkey in numerkeys:
                 if numkey in s:
                     s[numkey] = extfloat(s[numkey])
-            ret.append(s)
+            ret.append(fill_quote(s))
     return ret
 
 def symbol_list(symbols):
