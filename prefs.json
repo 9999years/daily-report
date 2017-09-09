@@ -109,14 +109,13 @@
 	},
 	"stocks": {
 		"format": [
-			"{align(Symbol, f'{format(PercentChange, \" ,.2f\")}%'.ljust(8),",
-			"f'{format(LastTradePriceOnly, \",.2f\")}{Currency}')}"
+			"{align(Symbol, f'{\"\" if PercentChange is None else format(PercentChange, \" ,.2f\")}%'.ljust(8),",
+			"f'{\"\" if LastTradePriceOnly is None else format(LastTradePriceOnly, \",.2f\")}{Currency}')}"
 		],
 		"section_end_format": "{default()}\n{thinhrule()}",
 		"source": "yahoo",
 		"symbols": [
 			{ "symbol": "^GSPC", "display_symbol": "S&P 500"},
-			{ "symbol": ".DJI", "display_symbol": "Dow Jones"},
 			{ "symbol": "^VIX", "display_symbol": "VIX"},
 			{ "symbol": "^IXIC", "display_symbol": "NASDAQ"},
 			{ "symbol": "CL=F", "display_symbol": "Oil"},
