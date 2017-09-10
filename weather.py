@@ -45,12 +45,15 @@ def graph(location=prefs['weather']['location']):
     inner_width = width - 2 * margin
     moments = hours(length=inner_width, location=location)
 
-    def limit(list, fn, key):
-        return getattr(fn(list, key=lambda x: getattr(x, key)), key)
+    if len(moments) == 0:
+        return ''
 
-    def limits(list, key):
-        return (limit(list, min, key),
-                limit(list, max, key))
+    def limit(seq, fn, key):
+        return getattr(fn(seq, key=lambda x: getattr(x, key)), key)
+
+    def limits(seq, key):
+        return (limit(seq, min, key),
+                limit(seq, max, key))
 
     (temp_max, temp_min)     = limits(moments, 'temp')
     (precip_max, precip_min) = limits(moments, 'precip')
