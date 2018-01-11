@@ -99,4 +99,4 @@ def due(day=1):
             ret.append(misc.format_left(extformat(
                     prefs['myhomework']['assignment_format'], hw
                 ), firstline=prefs['myhomework']['check']))
-    return ''.join(ret)
+    return ''.join(ret).rstrip()
