@@ -10,7 +10,7 @@
 		"{'tomorrow: ' + tmrw_forecast()!c}",
 		"{tmrw_conditions()!lc}", "{hrule()}",
 		"{weather_graph()}", "{hrule()}",
-		"{homework()}", "{thinrule()}",
+		"{homework()}", "{thinhrule()}",
 		"{classes()}", "{thinhrule()}",
 		"{todo()}", "{thinhrule()}",
 		"{events()}", "{thinhrule()}",
