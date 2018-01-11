@@ -125,5 +125,8 @@
 			"TSLA"
 		],
 		"excluded_currencies": ["USD"]
+	},
+	"myhomework": {
+		"base_url": "https://myhomeworkapp.com/"
 	}
 }
