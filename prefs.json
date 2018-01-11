@@ -14,12 +14,12 @@
 		"{todo()}", "{thinhrule()}",
 		"{events()}", "{thinhrule()}",
 		"{countdown()}", "{hrule()}",
-		"{headlines(news.nytimes('World'))}",
+		"{headlines(news.nytimes('US'))}",
+		"{headlines(news.nytimes('World'), amount=2)}",
 		"{headline(news.reuters('technologynews'))}",
 		"{hrule()}",
 		"{twitter('IGD_News')}", "{hrule()}",
 		"{twitter('dril')}", "{hrule()}",
-		"{stocks()}",
 		"\n\n\n\n"
 	],
 	"google": {
