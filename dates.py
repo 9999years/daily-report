@@ -31,6 +31,10 @@ def timezone():
         )
     return datetime.timezone(delt)
 
+def zonify(t):
+    if isinstance(t, datetime.date):
+        t = datetime.datetime(t.year, t.month, t.day)
+    return t.replace(tzinfo=timezone())
 
 def today_times(offset=0):
     # get today at midnight and tomorrow at midnight so we can fetch
@@ -290,4 +294,9 @@ def now_hm(fillchar=''):
     return misc.hoursminutes(datetime.datetime.now(), fillchar=fillchar)
 
 def iso_date(day=0):
-    return format(today_times(day)[0], '%Y-%m-%d')
+    if isinstance(day, int):
+        date = today_times(day)[0]
+    else:
+        # else datetime
+        date = day
+    return format(date, '%Y-%m-%d')
