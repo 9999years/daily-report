@@ -171,3 +171,13 @@ def listifier(obj):
         and not isinstance(obj, tuple)):
         obj = [obj]
     return obj
+
+def translate_keys(d, translation):
+    """translation is a dict mapping orig_keys -> out_keys"""
+    out = {}
+    for key, val in d.items():
+        if key in translation:
+            out[translation[key]] = val
+        else:
+            out[key] = val
+    return out

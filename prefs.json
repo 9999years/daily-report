@@ -10,6 +10,7 @@
 		"{'tomorrow: ' + tmrw_forecast()!c}",
 		"{tmrw_conditions()!lc}", "{hrule()}",
 		"{weather_graph()}", "{hrule()}",
+		"{homework()}", "{thinrule()}",
 		"{classes()}", "{thinhrule()}",
 		"{todo()}", "{thinhrule()}",
 		"{events()}", "{thinhrule()}",
@@ -127,6 +128,8 @@
 		"excluded_currencies": ["USD"]
 	},
 	"myhomework": {
-		"base_url": "https://myhomeworkapp.com/"
+		"base_url": "https://myhomeworkapp.com/",
+		"check": "[] ",
+		"assignment_format": "{name} ({class_name}, {iso_date(due)})"
 	}
 }
