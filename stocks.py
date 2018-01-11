@@ -291,11 +291,7 @@ def google_dat(symbols):
 
     for symbol in dat:
         # convert short keys to long keys
-        out = {}
-        for key in symbol:
-            if key in fullnames:
-                out[fullnames[key]] = symbol[key]
-        ret.append(fill_quote(out))
+        ret.append(fill_quote(translate_keys(symbol, fullnames)))
 
     return ret
 
