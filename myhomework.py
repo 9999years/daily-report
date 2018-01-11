@@ -1,10 +1,13 @@
 from bs4 import BeautifulSoup
+import bs4
 import urllib
 import requests
 import datetime
 
 import misc
 from prefs import prefs, keys
+from formatter import extformat
+import dates
 
 cache = {}
 
@@ -13,13 +16,13 @@ session = requests.Session()
 def url(path=''):
     return urllib.parse.urljoin(prefs['myhomework']['base_url'], path)
 
-def login_cookies():
+def login():
     global cache
     global session
     if 'cookies' in cache:
         return
     login_page = session.get(url('/login'))
-    form = BeautifulSoup(login_page.text, 'html').find(
+    form = BeautifulSoup(login_page.text, 'html.parser').find(
         'form', { 'class': 'login-form' })
     payload = {
         'username': keys['myhomework']['username'],
@@ -31,30 +34,69 @@ def login_cookies():
     login_response = session.post(login_url, data=payload)
     cache['cookies'] = session.cookies.get_dict()
 
+def hw_date(s):
+    """Wed, Jan 9, 2019 OR Wed, Jan 9"""
+    fmt = '%a, %b %d'
+    try:
+        d = datetime.datetime.strptime(s, fmt + ', %Y')
+    except ValueError:
+        d = datetime.datetime.strptime(s, fmt)
+        d = d.replace(year=datetime.date.today().year)
+    # i hope youre turning in hw in the same tz as your computer!
+    return dates.zonify(d)
+
 def hw_dict(bs):
     """BeautifulSoup el -> hw dict"""
     global session
-    bs = BeautifulSoup(session.get(url(bs.find('a')['href'])).text, 'html')
-    fields = bs.find('dl').children
+    bs = BeautifulSoup(session.get(url(bs.find('a')['href'])).text, 'html.parser')
+    fields = bs.find('dl')
     hw = {}
-    for field in fields:
-        if isinstance(field, str):
+    while fields is not None:
+        fields = fields.find_next('dt')
+        if fields is None:
+            break
+        dat = fields.find_next('dd')
+        if dat is None:
             continue
-        dat = next(fields)
-        if not isinstance(dat, str):
-            dat = dat.text
-        if dat == '--':
-            continue
-        hw[field.text] = dat
-    return hw
+        dat = dat.text
+        if dat != '--' and dat.strip() != '':
+            hw[fields.text] = dat
+    if 'Date' in hw:
+        hw['Due Date'] = hw['Date']
+        del hw['Date']
+    if 'Due Date' in hw:
+        hw['Due Date'] = hw_date(hw['Due Date'])
+    return misc.translate_keys(hw, {
+        'Description': 'name',
+        'Class': 'class_name',
+        'Due Date': 'due',
+        'Reminder': 'reminder',
+        'Priority': 'priority',
+        'Additional Info': 'info',
+        'Type': 'type',
+    })
 
 def homework():
     global session
-    login_cookies()
+    if 'homework' in cache:
+        return cache['homework']
+    login()
     home = session.get(url('/home'))
-    hws = BeautifulSoup(home.text, 'html').find('ul',
+    hws = BeautifulSoup(home.text, 'html.parser').find('ul',
         { 'class': 'homework-list' }).find_all('li', { 'class': 'hw-row' })
     assignments = []
     for hw in hws:
         assignments.append(hw_dict(hw))
+    cache['homework'] = assignments
     return assignments
+
+def due(day=1):
+    hws = homework()
+    ret = []
+    _, day = dates.today_times(day)
+    for hw in hws:
+        if hw['due'] <= day:
+            ret.append(misc.format_left(extformat(
+                    prefs['myhomework']['assignment_format'], hw
+                ), firstline=prefs['myhomework']['check']))
+    return ''.join(ret)
