@@ -46,12 +46,20 @@ def login():
 
 def hw_date(s):
     """Wed, Jan 9, 2019 OR Wed, Jan 9"""
-    fmt = '%a, %b %d'
-    try:
-        d = datetime.datetime.strptime(s, fmt + ', %Y')
-    except ValueError:
-        d = datetime.datetime.strptime(s, fmt)
-        d = d.replace(year=datetime.date.today().year)
+    fmts = [
+        '%a, %b %d, %I:%M %p, %Y', # Wed, Jan 9, 6:30 PM, 2019
+        '%a, %b %d, %Y',           # Wed, Jan 9, 2019
+        '%a, %b %d, %I:%M  %p',    # Wed, Jan 9, 6:30 PM
+        '%a, %b %d',               # Wed, Jan 9
+    ]
+    for fmt in fmts:
+        try:
+            d = datetime.datetime.strptime(s, fmt)
+            if '%Y' not in fmt:
+                d = d.replace(year=datetime.date.today().year)
+            break
+        except ValueError:
+            continue
     # i hope youre turning in hw in the same tz as your computer!
     return dates.zonify(d)
 
@@ -61,6 +69,7 @@ def hw_dict(bs):
     bs = BeautifulSoup(session.get(url(bs.find('a')['href'])).text, 'html.parser')
     fields = bs.find('dl')
     hw = {}
+    hw.update(empty_hw)
     while fields is not None:
         fields = fields.find_next('dt')
         if fields is None:
@@ -85,7 +94,6 @@ def hw_dict(bs):
         'Additional Info': 'info',
         'Type': 'type',
     })
-    hw.update(empty_hw)
     return hw
 
 def homework():
@@ -112,3 +120,9 @@ def due(day=1):
                     prefs['myhomework']['assignment_format'], hw
                 ), firstline=prefs['myhomework']['check']))
     return ''.join(ret).rstrip()
+
+def main():
+    print(due())
+
+if __name__ == '__main__':
+    main()
