@@ -13,6 +13,16 @@ cache = {}
 
 session = requests.Session()
 
+empty_hw = {
+    'name': '',
+    'class_name': '',
+    'due': dates.zonify(datetime.datetime.today()),
+    'reminder': '',
+    'priority': '',
+    'info': '',
+    'type': '',
+}
+
 def url(path=''):
     return urllib.parse.urljoin(prefs['myhomework']['base_url'], path)
 
@@ -47,7 +57,7 @@ def hw_date(s):
 
 def hw_dict(bs):
     """BeautifulSoup el -> hw dict"""
-    global session
+    global session, empty_hw
     bs = BeautifulSoup(session.get(url(bs.find('a')['href'])).text, 'html.parser')
     fields = bs.find('dl')
     hw = {}
@@ -66,7 +76,7 @@ def hw_dict(bs):
         del hw['Date']
     if 'Due Date' in hw:
         hw['Due Date'] = hw_date(hw['Due Date'])
-    return misc.translate_keys(hw, {
+    hw = misc.translate_keys(hw, {
         'Description': 'name',
         'Class': 'class_name',
         'Due Date': 'due',
@@ -75,6 +85,8 @@ def hw_dict(bs):
         'Additional Info': 'info',
         'Type': 'type',
     })
+    hw.update(empty_hw)
+    return hw
 
 def homework():
     global session
@@ -95,7 +107,7 @@ def due(day=1):
     ret = []
     _, day = dates.today_times(day)
     for hw in hws:
-        if hw['due'] <= day:
+        if 'due' in hw and hw['due'] <= day:
             ret.append(misc.format_left(extformat(
                     prefs['myhomework']['assignment_format'], hw
                 ), firstline=prefs['myhomework']['check']))
