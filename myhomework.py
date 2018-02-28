@@ -13,6 +13,16 @@ cache = {}
 
 session = requests.Session()
 
+empty_hw = {
+    'name': '',
+    'class_name': '',
+    'due': dates.zonify(datetime.datetime.today()),
+    'reminder': '',
+    'priority': '',
+    'info': '',
+    'type': '',
+}
+
 def url(path=''):
     return urllib.parse.urljoin(prefs['myhomework']['base_url'], path)
 
@@ -36,24 +46,32 @@ def login():
 
 def hw_date(s):
     """Wed, Jan 9, 2019 OR Wed, Jan 9"""
-    fmt = '%a, %b %d'
-    try:
-        d = datetime.datetime.strptime(s, fmt + ', %Y')
-    except ValueError:
-        today = datetime.date.today()
-        d = datetime.datetime.strptime(s, fmt)
-        d = d.replace(year=today.year)
+    fmts = [
+        '%a, %b %d, %I:%M %p, %Y', # Wed, Jan 9, 6:30 PM, 2019
+        '%a, %b %d, %Y',           # Wed, Jan 9, 2019
+        '%a, %b %d, %I:%M  %p',    # Wed, Jan 9, 6:30 PM
+        '%a, %b %d',               # Wed, Jan 9
+    ]
+    for fmt in fmts:
+        try:
+            d = datetime.datetime.strptime(s, fmt)
+            if '%Y' not in fmt:
+                d = d.replace(year=datetime.date.today().year)
+            break
+        except ValueError:
+            continue
     # i hope youre turning in hw in the same tz as your computer!
     return dates.zonify(d)
 
 def hw_dict(bs):
     """BeautifulSoup el -> hw dict"""
-    global session
+    global session, empty_hw
     bs = BeautifulSoup(session.get(url(bs.find('a')['href'])).text, 'html.parser')
     # TODO: take due date from assignment .h-date and infer year from .late
     # class presence
     fields = bs.find('dl')
     hw = {}
+    hw.update(empty_hw)
     while fields is not None:
         fields = fields.find_next('dt')
         if fields is None:
@@ -69,7 +87,7 @@ def hw_dict(bs):
         del hw['Date']
     if 'Due Date' in hw:
         hw['Due Date'] = hw_date(hw['Due Date'])
-    return misc.translate_keys(hw, {
+    hw = misc.translate_keys(hw, {
         'Description': 'name',
         'Class': 'class_name',
         'Due Date': 'due',
@@ -78,6 +96,7 @@ def hw_dict(bs):
         'Additional Info': 'info',
         'Type': 'type',
     })
+    return hw
 
 def homework():
     global session
@@ -99,7 +118,13 @@ def due(day=1):
     _, day = dates.today_times(day)
     for hw in hws:
         if 'due' in hw and hw['due'] <= day:
-                ret.append(misc.format_left(extformat(
-                        prefs['myhomework']['assignment_format'], hw
-                    ), firstline=prefs['myhomework']['check']))
+            ret.append(misc.format_left(extformat(
+                    prefs['myhomework']['assignment_format'], hw
+                ), firstline=prefs['myhomework']['check']))
     return ''.join(ret).rstrip()
+
+def main():
+    print(due())
+
+if __name__ == '__main__':
+    main()

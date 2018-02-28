@@ -2,7 +2,6 @@
 import argparse
 from sys import stdout
 import re
-import uni2esky
 
 # local imports
 from prefs import prefs, keys
@@ -15,9 +14,7 @@ def report():
     return misc.deduplicate_rules(msg)
 
 def main():
-    parser = argparse.ArgumentParser(
-        description='Generates a daily report'
-    )
+    parser = argparse.ArgumentParser(description='Generates a daily report')
 
     parser.add_argument('-e', '--encoding', type=str, default='utf-8',
         help='Output encoding. Default is UTF-8. Irrelevant with --print')
@@ -28,11 +25,7 @@ def main():
     args = parser.parse_args()
 
     msg = report()
-    if args.print:
-        msg = b'\x1b\x33\x18' + uni2esky.encode(msg)
-        stdout.buffer.write(msg)
-    else:
-        stdout.buffer.write(msg.encode(args.encoding, errors='replace'))
+    stdout.buffer.write(msg.encode(args.encoding, errors='replace'))
 
 if __name__ == '__main__':
     main()
