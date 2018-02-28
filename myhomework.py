@@ -40,8 +40,9 @@ def hw_date(s):
     try:
         d = datetime.datetime.strptime(s, fmt + ', %Y')
     except ValueError:
+        today = datetime.date.today()
         d = datetime.datetime.strptime(s, fmt)
-        d = d.replace(year=datetime.date.today().year)
+        d = d.replace(year=today.year)
     # i hope youre turning in hw in the same tz as your computer!
     return dates.zonify(d)
 
@@ -49,6 +50,8 @@ def hw_dict(bs):
     """BeautifulSoup el -> hw dict"""
     global session
     bs = BeautifulSoup(session.get(url(bs.find('a')['href'])).text, 'html.parser')
+    # TODO: take due date from assignment .h-date and infer year from .late
+    # class presence
     fields = bs.find('dl')
     hw = {}
     while fields is not None:
@@ -95,8 +98,8 @@ def due(day=1):
     ret = []
     _, day = dates.today_times(day)
     for hw in hws:
-        if hw['due'] <= day:
-            ret.append(misc.format_left(extformat(
-                    prefs['myhomework']['assignment_format'], hw
-                ), firstline=prefs['myhomework']['check']))
+        if 'due' in hw and hw['due'] <= day:
+                ret.append(misc.format_left(extformat(
+                        prefs['myhomework']['assignment_format'], hw
+                    ), firstline=prefs['myhomework']['check']))
     return ''.join(ret).rstrip()
