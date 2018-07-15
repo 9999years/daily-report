@@ -31,7 +31,7 @@ def hours(length=24, location=prefs['weather']['location']):
         if i >= length:
             break
         moments.append(Weather(
-            temp=int(hour['temp']['english']),
+            temp=float(hour['temp']['english']),
             precip=int(hour['pop']),
             time=str(int(hour['FCTTIME']['hour']) % 12 + 1)
             + hour['FCTTIME']['ampm']
