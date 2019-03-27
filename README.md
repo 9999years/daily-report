@@ -1,3 +1,18 @@
+# Indefinite archival notice
+Due to a few combined circumstances:
+  - [Weather Underground shut down their API][wunderground]
+  - I don’t use this script at the moment because I realized that printing a
+    receipt every day just to throw it out is pretty wasteful
+  - I realized that the [`extendedformatter`][extformat] library I created is a
+    glorified `eval()` and is probably a pretty terrible idea (even in this
+    case, where user input is assumed (??) to be trusted)
+  - [Google deprecated the `oauth2client` library][oauth2client] this project
+    uses to interface with Google Calendar (etc.)
+Development on this project is halted for the time being. There’s a chance I’ll
+touch it up in the future, but I’m pretty busy right now.
+
+# The Daily Report
+
 > I said hey, what's going on?
 >
 > — “What’s Up?” by 4 Non Blondes (1992, Interscope Records)
@@ -5,7 +20,7 @@
 The Daily Report is a script to output a daily briefing designed for use with a
 receipt printer (and cron-job / Raspberry Pi).
 
-Usage / sample ouput:
+Usage / sample output:
 
     $ ./dailyreport.py
 
@@ -216,3 +231,4 @@ to do a few things.
 [strftime]: https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
 [cust]: ./customization.md
 [extformat]: https://github.com/9999years/extendedformatter
+[oauth2client]: https://google-auth.readthedocs.io/en/latest/oauth2client-deprecation.html
